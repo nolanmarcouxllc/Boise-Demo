@@ -1,70 +1,81 @@
-import type { ComponentType } from 'react'
-import { DetailPanel } from './components/DetailPanel'
-import { PresentationControls, Sidebar, TopBar } from './components/Shell'
-import { AgentNetwork } from './screens/AgentNetwork'
-import { BranchOverview } from './screens/BranchOverview'
-import { ControlTower } from './screens/ControlTower'
-import { DiscoveryBoard } from './screens/DiscoveryBoard'
-import { ExceptionCenter } from './screens/ExceptionCenter'
-import { ManagementBrief } from './screens/ManagementBrief'
-import { NextStep } from './screens/NextStep'
-import { Opening } from './screens/Opening'
-import { Opportunity } from './screens/Opportunity'
-import { OptimizationLab } from './screens/OptimizationLab'
-import { OrderFlow } from './screens/OrderFlow'
-import { PlannedVsActual } from './screens/PlannedVsActual'
-import { AppProvider, useApp } from './state/AppContext'
+import { useState } from 'react'
+import { AgentActivity } from './dashboard/AgentActivity'
+import { CapacityChart } from './dashboard/CapacityChart'
+import { Header } from './dashboard/Header'
+import { ManagementBrief } from './dashboard/ManagementBrief'
+import { Metrics } from './dashboard/Metrics'
+import { Priorities } from './dashboard/Priorities'
+import { RouteMapPanel } from './dashboard/RouteMapPanel'
+import { Sidebar } from './dashboard/Sidebar'
+import type { NavItem } from './dashboard/data'
 
-const screens: Record<string, ComponentType> = {
-  opening: Opening,
-  overview: BranchOverview,
-  agents: AgentNetwork,
-  'order-flow': OrderFlow,
-  'control-tower': ControlTower,
-  exceptions: ExceptionCenter,
-  lab: OptimizationLab,
-  'planned-actual': PlannedVsActual,
-  brief: ManagementBrief,
-  opportunity: Opportunity,
-  discovery: DiscoveryBoard,
-  'next-step': NextStep,
-}
+/**
+ * Column weights are taken from the reference: the map spans the first two
+ * bottom-row columns and the priorities panel lines up with the capacity chart,
+ * so both rows share one column definition.
+ */
+const COLS = 'grid-cols-[578fr_286fr_533fr]'
 
-function Screen() {
-  const { section } = useApp()
-  const Component = screens[section] ?? BranchOverview
+/** Thin timber strip closing the screen. Solid plank segments, no gradient. */
+const PLANKS: Array<[string, number]> = [
+  ['#DCC7A2', 7],
+  ['#E1CFAD', 4],
+  ['#D6C098', 6],
+  ['#E0CDA8', 5],
+  ['#DAC49F', 8],
+  ['#E4D3B4', 3],
+  ['#D3BC93', 6],
+  ['#DECBA6', 5],
+  ['#D0B78C', 4],
+  ['#E2D1B0', 7],
+]
+
+function WoodAccent() {
   return (
-    <div key={section} className="animate-fade-up">
-      <Component />
-    </div>
-  )
-}
-
-function Layout() {
-  const { mode } = useApp()
-  const presenting = mode === 'presentation'
-
-  return (
-    <div className={`flex h-screen w-full overflow-hidden ${presenting ? 'presenting' : ''}`}>
-      {!presenting && <Sidebar />}
-      <div className="flex min-w-0 flex-1 flex-col">
-        <TopBar />
-        <main className="min-h-0 flex-1 overflow-y-auto">
-          <div className={`mx-auto w-full ${presenting ? 'max-w-[1500px] px-8 py-8' : 'max-w-[1600px] px-6 py-6'}`}>
-            <Screen />
-          </div>
-          {presenting && <PresentationControls />}
-        </main>
-      </div>
-      <DetailPanel />
+    <div aria-hidden className="flex w-full shrink-0 overflow-hidden" style={{ height: 16 }}>
+      {[0, 1, 2, 3].map((rep) =>
+        PLANKS.map(([color, weight], i) => (
+          <span key={`${rep}-${i}`} className="h-full" style={{ backgroundColor: color, flex: `${weight} 1 0%` }} />
+        )),
+      )}
     </div>
   )
 }
 
 export default function App() {
+  const [nav, setNav] = useState<NavItem>('Branch Overview')
+  const [presenting, setPresenting] = useState(true)
+  const [mode, setMode] = useState('Explore Mode')
+  const [priority, setPriority] = useState<number | null>(null)
+  const [agent, setAgent] = useState<string | null>(null)
+  const [showWhy, setShowWhy] = useState(false)
+
   return (
-    <AppProvider>
-      <Layout />
-    </AppProvider>
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-white">
+      <div className="grid min-h-0 flex-1 grid-cols-[255px_1fr]">
+        <Sidebar active={nav} onSelect={setNav} />
+
+        <div className="grid min-h-0 min-w-0 grid-rows-[82px_1fr]">
+          <Header presenting={presenting} onPresentingChange={setPresenting} mode={mode} onModeChange={setMode} />
+
+          <div className="grid min-h-0 grid-rows-[104px_minmax(0,398px)_minmax(0,398px)] content-start gap-2.5 px-[18px] pb-3">
+            <Metrics />
+
+            <div className={`grid min-h-0 gap-2.5 ${COLS}`}>
+              <RouteMapPanel />
+              <Priorities selected={priority} onSelect={(n) => setPriority((p) => (p === n ? null : n))} />
+            </div>
+
+            <div className={`grid min-h-0 gap-2.5 ${COLS}`}>
+              <AgentActivity selected={agent} onSelect={(id) => setAgent((a) => (a === id ? null : id))} />
+              <ManagementBrief showWhy={showWhy} onToggle={() => setShowWhy((v) => !v)} />
+              <CapacityChart />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <WoodAccent />
+    </div>
   )
 }
