@@ -85,16 +85,57 @@ export function notesToJson(notes: MeetingNote[], overrides: WorkflowOverride[])
   )
 }
 
-export function download(filename: string, contents: string, type: string) {
-  const blob = new Blob([contents], { type })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
+export type SaveOutcome = 'saved' | 'declined' | 'unavailable'
+
+/**
+ * Minimal shape of the hosted-page save bridge. When this application is served
+ * inside a sandboxed viewer, an ordinary download link is inert and the host
+ * supplies this instead. Running locally there is no bridge and the blob path is
+ * used, so behaviour on the presentation laptop is unchanged.
+ */
+interface SaveBridge {
+  save(request: { filename: string; data: string }): Promise<unknown>
+}
+interface HostRuntime {
+  use?(name: string): Promise<unknown>
+}
+
+async function saveBridge(): Promise<SaveBridge | null> {
+  try {
+    const host = (globalThis as { claude?: HostRuntime }).claude
+    if (typeof host?.use !== 'function') return null
+    const ns = await host.use('downloads')
+    return ns && typeof (ns as SaveBridge).save === 'function' ? (ns as SaveBridge) : null
+  } catch {
+    return null
+  }
+}
+
+export async function download(filename: string, contents: string, type: string): Promise<SaveOutcome> {
+  const bridge = await saveBridge()
+  if (bridge) {
+    try {
+      await bridge.save({ filename, data: contents })
+      return 'saved'
+    } catch (err) {
+      return (err as { code?: string })?.code === 'declined' ? 'declined' : 'unavailable'
+    }
+  }
+
+  try {
+    const blob = new Blob([contents], { type })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    return 'saved'
+  } catch {
+    return 'unavailable'
+  }
 }
 
 export async function copyToClipboard(text: string): Promise<boolean> {

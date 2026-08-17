@@ -44,6 +44,18 @@ export function DiscoveryBoard() {
   const [copied, setCopied] = useState(false)
   const [confirmClear, setConfirmClear] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [status, setStatus] = useState('')
+
+  const save = async (filename: string, contents: string, type: string) => {
+    const outcome = await download(filename, contents, type)
+    setStatus(
+      outcome === 'saved'
+        ? ''
+        : outcome === 'declined'
+          ? 'Save cancelled. Nothing was written.'
+          : 'This viewer will not let the page save a file. Use the copy button, or run the demonstration locally to export.',
+    )
+  }
 
   const markdown = useMemo(() => notesToMarkdown(notes, workflowOverrides), [notes, workflowOverrides])
   const grouped = useMemo(() => {
@@ -159,7 +171,7 @@ export function DiscoveryBoard() {
               <button
                 type="button"
                 className="btn btn-secondary w-full"
-                onClick={() => download('westfield-discovery-notes.json', notesToJson(notes, workflowOverrides), 'application/json')}
+                onClick={() => save('westfield-discovery-notes.json', notesToJson(notes, workflowOverrides), 'application/json')}
                 disabled={!notes.length && !workflowOverrides.length}
               >
                 <FileJson className="h-4 w-4" aria-hidden /> Export notes as JSON
@@ -167,7 +179,7 @@ export function DiscoveryBoard() {
               <button
                 type="button"
                 className="btn btn-secondary w-full"
-                onClick={() => download('westfield-meeting-summary.md', markdown, 'text/markdown')}
+                onClick={() => save('westfield-meeting-summary.md', markdown, 'text/markdown')}
                 disabled={!notes.length && !workflowOverrides.length}
               >
                 <Download className="h-4 w-4" aria-hidden /> Export meeting summary as Markdown
@@ -178,6 +190,7 @@ export function DiscoveryBoard() {
                 onClick={async () => {
                   const ok = await copyToClipboard(markdown)
                   setCopied(ok)
+                  setStatus(ok ? '' : 'This browser blocked the clipboard. Use one of the export buttons instead.')
                   window.setTimeout(() => setCopied(false), 2400)
                 }}
                 disabled={!notes.length && !workflowOverrides.length}
@@ -189,6 +202,11 @@ export function DiscoveryBoard() {
                 <Trash2 className="h-4 w-4" aria-hidden /> Clear all notes
               </button>
             </div>
+            {status && (
+              <p role="status" className="mt-3 rounded-[3px] border border-alert-warn/40 bg-alert-warn/5 px-3 py-2 text-[12px] leading-relaxed text-alert-warn">
+                {status}
+              </p>
+            )}
             <p className="mt-3 text-[12px] leading-relaxed text-charcoal-500">
               Notes are stored in this browser only. Nothing is sent to an external service.
             </p>

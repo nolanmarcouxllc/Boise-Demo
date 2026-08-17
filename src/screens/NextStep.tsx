@@ -30,6 +30,7 @@ export function NextStep() {
   const { notes, workflowOverrides, goToSection } = useApp()
   const [summary, setSummary] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [status, setStatus] = useState('')
 
   const build = () => setSummary(buildScopingSummary(notes, workflowOverrides))
 
@@ -102,6 +103,7 @@ export function NextStep() {
                   onClick={async () => {
                     const ok = await copyToClipboard(summary)
                     setCopied(ok)
+                    setStatus(ok ? '' : 'This browser blocked the clipboard. Select the text below instead.')
                     window.setTimeout(() => setCopied(false), 2400)
                   }}
                 >
@@ -111,7 +113,16 @@ export function NextStep() {
                 <button
                   type="button"
                   className="btn btn-secondary btn-sm"
-                  onClick={() => download('westfield-scoping-summary.md', summary, 'text/markdown')}
+                  onClick={async () => {
+                    const outcome = await download('westfield-scoping-summary.md', summary, 'text/markdown')
+                    setStatus(
+                      outcome === 'saved'
+                        ? ''
+                        : outcome === 'declined'
+                          ? 'Save cancelled. Nothing was written.'
+                          : 'This viewer will not let the page save a file. Copy the summary below instead.',
+                    )
+                  }}
                 >
                   <Download className="h-3.5 w-3.5" aria-hidden /> Download
                 </button>
@@ -138,9 +149,16 @@ export function NextStep() {
             </p>
           )
         ) : (
-          <pre className="max-h-[520px] overflow-auto whitespace-pre-wrap rounded-[3px] border border-charcoal-200 bg-charcoal-50 p-4 font-mono text-[12px] leading-relaxed text-charcoal-700">
-            {summary}
-          </pre>
+          <>
+            {status && (
+              <p role="status" className="mb-3 rounded-[3px] border border-alert-warn/40 bg-alert-warn/5 px-3 py-2 text-[12px] leading-relaxed text-alert-warn">
+                {status}
+              </p>
+            )}
+            <pre className="max-h-[520px] overflow-auto whitespace-pre-wrap rounded-[3px] border border-charcoal-200 bg-charcoal-50 p-4 font-mono text-[12px] leading-relaxed text-charcoal-700">
+              {summary}
+            </pre>
+          </>
         )}
       </Panel>
 
