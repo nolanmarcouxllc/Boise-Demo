@@ -94,7 +94,39 @@ export function exportMarkdown(): string {
   return lines.join('\n')
 }
 
-export function download(filename: string, contents: string, type: string): void {
+/**
+ * Minimal shape of the host runtime available when the board is opened through
+ * a sandboxed viewer rather than served from its own origin.
+ */
+interface HostRuntime {
+  use(name: 'downloads'): Promise<{ save(r: { filename: string; data: string }): Promise<unknown> } | null>
+}
+
+export type DownloadResult = 'saved' | 'declined' | 'unavailable'
+
+/**
+ * Hand the export to the operator. A sandboxed viewer blocks page-initiated
+ * downloads outright, so ask the host to save the file when it offers that and
+ * fall back to an anchor when the board is served normally. The caller needs to
+ * know which happened — a silent no-op looks like the meeting notes vanished.
+ */
+export async function download(filename: string, contents: string, type: string): Promise<DownloadResult> {
+  const host = (globalThis as { claude?: HostRuntime }).claude
+  if (host?.use) {
+    try {
+      const downloads = await host.use('downloads')
+      if (downloads) {
+        await downloads.save({ filename, data: contents })
+        return 'saved'
+      }
+    } catch (err) {
+      const code = (err as { code?: string } | null)?.code
+      // Only a lifecycle failure is worth retrying through an anchor; a viewer
+      // who declined has answered the question.
+      if (code === 'declined' || code === 'rate_limited') return 'declined'
+    }
+  }
+
   try {
     const blob = new Blob([contents], { type })
     const url = URL.createObjectURL(blob)
@@ -105,7 +137,8 @@ export function download(filename: string, contents: string, type: string): void
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+    return 'saved'
   } catch {
-    /* a sandboxed viewer can block page-initiated downloads */
+    return 'unavailable'
   }
 }

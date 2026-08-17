@@ -8,6 +8,7 @@
 | Production build | Passing. Validated served, including SPA deep links. |
 | Behaviour without env vars | Validated. Shows the local-storage fallback, no blank screen. |
 | Vercel | **Not deployed.** Blocked by network policy in the build environment, not by credentials. |
+| Exports | Working in both a normal browser and a sandboxed viewer. |
 
 `api.vercel.com` and `vercel.com` are both refused at this environment's egress
 proxy (403 on CONNECT). The refusal happens before any request is sent, so an
@@ -28,12 +29,11 @@ The repository is already on GitHub, so nothing needs to be uploaded.
    Both values are in your local `.env` (gitignored), and in the Supabase
    dashboard under Project Settings → API. The publishable key is browser-safe
    by design; every table is protected by row-level security.
-5. **Settings → Git → Production Branch**: set to
-   `claude/boise-cascade-command-center-r4mwov`.
-   The repository has no `main` branch yet, so without this Vercel has no
-   production branch to build. Alternatively merge the branch to `main` first
-   and leave the default.
-6. Deploy.
+5. Deploy.
+
+No branch configuration is needed. `claude/boise-cascade-command-center-r4mwov`
+is the repository's default branch on GitHub, so Vercel adopts it as the
+production branch on import and every later push to it redeploys.
 
 ## CLI route, if you prefer
 

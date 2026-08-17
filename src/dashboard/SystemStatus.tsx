@@ -23,6 +23,18 @@ export function SystemStatus({ open, onClose }: { open: boolean; onClose: () => 
 
   if (!open) return null
 
+  const runExport = async (filename: string, contents: string, type: string) => {
+    setState('Preparing export…')
+    const r = await download(filename, contents, type)
+    setState(
+      r === 'saved'
+        ? `Exported ${filename}`
+        : r === 'declined'
+          ? 'Export cancelled'
+          : 'This viewer blocks downloads — copy the notes from the Discovery Board instead.',
+    )
+  }
+
   const signIn = async () => {
     if (!supabase || !signInEmail.trim()) return
     setMsg('Sending link…')
@@ -85,8 +97,20 @@ export function SystemStatus({ open, onClose }: { open: boolean; onClose: () => 
             >
               Sync now
             </button>
-            <button type="button" onClick={() => download('westfield-meeting.json', exportJson(), 'application/json')} className="cond rounded-sm2 border border-line px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.07em] text-ink hover:border-accent">Export JSON</button>
-            <button type="button" onClick={() => download('westfield-meeting.md', exportMarkdown(), 'text/markdown')} className="cond rounded-sm2 border border-line px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.07em] text-ink hover:border-accent">Export Markdown</button>
+            <button
+              type="button"
+              onClick={() => void runExport('westfield-meeting.json', exportJson(), 'application/json')}
+              className="cond rounded-sm2 border border-line px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.07em] text-ink hover:border-accent"
+            >
+              Export JSON
+            </button>
+            <button
+              type="button"
+              onClick={() => void runExport('westfield-meeting.md', exportMarkdown(), 'text/markdown')}
+              className="cond rounded-sm2 border border-line px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.07em] text-ink hover:border-accent"
+            >
+              Export Markdown
+            </button>
             {email && supabase && (
               <button type="button" onClick={() => void supabase?.auth.signOut()} className="cond rounded-sm2 border border-line px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.07em] text-inkSoft">Sign out</button>
             )}
