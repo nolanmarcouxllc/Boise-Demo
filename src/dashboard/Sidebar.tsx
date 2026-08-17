@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { navItems, type NavItem } from './data'
 import { NavIcon } from './icons'
 
@@ -17,6 +18,17 @@ function Logo() {
 }
 
 export function Sidebar({ active, onSelect }: { active: NavItem; onSelect: (n: NavItem) => void }) {
+  const [profileOpen, setProfileOpen] = useState(false)
+  const profileRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!profileOpen) return
+    const onDoc = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false)
+    }
+    document.addEventListener('mousedown', onDoc)
+    return () => document.removeEventListener('mousedown', onDoc)
+  }, [profileOpen])
+
   return (
     <aside className="flex min-h-0 flex-col bg-forestDeep text-white" aria-label="Command center sections">
       <Logo />
@@ -66,8 +78,28 @@ export function Sidebar({ active, onSelect }: { active: NavItem; onSelect: (n: N
         </p>
       </div>
 
-      <div className="mt-6 border-t border-white/15 px-4" style={{ paddingTop: 12, paddingBottom: 14 }}>
-        <button type="button" className="flex w-full items-center gap-2.5 text-left">
+      <div className="relative mt-6 border-t border-white/15 px-4" style={{ paddingTop: 12, paddingBottom: 14 }} ref={profileRef}>
+        {profileOpen && (
+          <div className="absolute bottom-[62px] left-4 right-4 z-40 overflow-hidden rounded-sm2 border border-line bg-white py-1 shadow-xl">
+            {['Switch branch', 'Notification settings', 'Sign out'].map((label) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => setProfileOpen(false)}
+                className="block w-full px-3 py-1.5 text-left text-[12px] text-ink hover:bg-shell"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={() => setProfileOpen((v) => !v)}
+          aria-expanded={profileOpen}
+          aria-haspopup="menu"
+          className="flex w-full items-center gap-2.5 rounded-sm2 text-left hover:bg-white/5"
+        >
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" aria-hidden>
               <circle cx="12" cy="8.5" r="3.5" />
@@ -78,7 +110,16 @@ export function Sidebar({ active, onSelect }: { active: NavItem; onSelect: (n: N
             <span className="block truncate text-[12.5px] font-medium leading-tight text-white">Westfield Ops Manager</span>
             <span className="cond block truncate text-[10px] uppercase leading-tight tracking-[0.1em] text-white/60">Westfield Branch</span>
           </span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" aria-hidden>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="2"
+            aria-hidden
+            style={{ transform: profileOpen ? 'rotate(180deg)' : undefined }}
+          >
             <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>

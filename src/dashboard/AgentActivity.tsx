@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { agentRows, toneHex } from './data'
 import { AgentGlyphIcon } from './icons'
 
@@ -7,9 +8,28 @@ const LEGEND = [
   { label: 'Human Approval', tone: 'red' as const },
 ]
 
-export function AgentActivity({ selected, onSelect }: { selected: string | null; onSelect: (id: string) => void }) {
+export function AgentActivity({
+  selected,
+  onSelect,
+  onOpen,
+}: {
+  selected: string | null
+  onSelect: (id: string) => void
+  onOpen: (id: string) => void
+}) {
+  const [menu, setMenu] = useState<string | null>(null)
+  const wrap = useRef<HTMLElement>(null)
+  useEffect(() => {
+    if (!menu) return
+    const onDoc = (e: MouseEvent) => {
+      if (wrap.current && !wrap.current.contains(e.target as Node)) setMenu(null)
+    }
+    document.addEventListener('mousedown', onDoc)
+    return () => document.removeEventListener('mousedown', onDoc)
+  }, [menu])
+
   return (
-    <section className="panel">
+    <section className="panel" ref={wrap}>
       <div className="panel-head">
         <div className="flex items-baseline gap-2.5">
           <h2 className="panel-title">Agent Activity</h2>
@@ -40,7 +60,7 @@ export function AgentActivity({ selected, onSelect }: { selected: string | null;
             {agentRows.map((a) => (
               <tr
                 key={a.id}
-                onClick={() => onSelect(a.id)}
+                onClick={() => { onSelect(a.id); onOpen(a.id) }}
                 className={`cursor-pointer border-b border-lineSoft last:border-0 ${selected === a.id ? 'bg-[#F1F6F2]' : 'hover:bg-shell'}`}
               >
                 <td className="px-3.5 py-[6px]">
@@ -59,15 +79,37 @@ export function AgentActivity({ selected, onSelect }: { selected: string | null;
                   </span>
                 </td>
                 <td className="cond py-[6px] pr-2 text-[10.5px] text-inkSoft"><span className="block truncate">{a.activity}</span></td>
-                <td className="pr-3 text-right">
+                <td className="relative pr-3 text-right">
                   <button
                     type="button"
                     aria-label={`Actions for ${a.name}`}
-                    onClick={(e) => e.stopPropagation()}
+                    aria-expanded={menu === a.id}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setMenu(menu === a.id ? null : a.id)
+                    }}
                     className="text-[15px] leading-none text-inkFaint hover:text-ink"
                   >
                     ⋯
                   </button>
+                  {menu === a.id && (
+                    <div className="absolute right-2 top-full z-40 w-40 overflow-hidden rounded-sm2 border border-line bg-white py-1 text-left shadow-lg">
+                      {['Open agent detail', 'View findings', 'Mute for today'].map((label) => (
+                        <button
+                          key={label}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setMenu(null)
+                            if (label !== 'Mute for today') onOpen(a.id)
+                          }}
+                          className="block w-full px-3 py-1.5 text-[11.5px] text-ink hover:bg-shell"
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}

@@ -136,8 +136,14 @@ function DistributionCenter({ x, y }: { x: number; y: number }) {
   )
 }
 
-export function RouteMapPanel() {
+export function RouteMapPanel({ onOpenRoute }: { onOpenRoute: (id: string) => void }) {
   const [zoom, setZoom] = useState(1)
+  const [hidden, setHidden] = useState<string[]>([])
+  const [updated, setUpdated] = useState('7:45 AM')
+  const toggle = (id: string) => setHidden((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
+  const visible = (id: string) => !hidden.includes(id)
+  // Route 101..105 in the legend map onto the modeled route records.
+  const routeRecord: Record<string, string> = { '101': 'RT-01', '102': 'RT-12', '103': 'RT-03', '104': 'RT-04', '105': 'RT-05' }
   const clamp = (z: number) => Math.min(1.6, Math.max(0.8, Number(z.toFixed(2))))
 
   return (
@@ -153,11 +159,20 @@ export function RouteMapPanel() {
 
           <ul className="mt-3 space-y-[9px]">
             {['101', '102', '103', '104', '105'].map((r) => (
-              <li key={r} className="flex items-center gap-2.5">
-                <svg width="26" height="8" aria-hidden>
-                  <line x1="1" y1="4" x2="25" y2="4" stroke={ROUTE} strokeWidth="3.4" strokeLinecap="round" />
-                </svg>
-                <span className="text-[12.5px] text-ink">Route {r}</span>
+              <li key={r}>
+                <button
+                  type="button"
+                  onClick={() => toggle(r)}
+                  onDoubleClick={() => onOpenRoute(routeRecord[r])}
+                  aria-pressed={visible(r)}
+                  title="Click to show or hide · double-click to open the route"
+                  className={`flex w-full items-center gap-2.5 rounded-sm2 px-1 py-[1px] text-left hover:bg-shell ${visible(r) ? '' : 'opacity-40'}`}
+                >
+                  <svg width="26" height="8" aria-hidden>
+                    <line x1="1" y1="4" x2="25" y2="4" stroke={ROUTE} strokeWidth="3.4" strokeLinecap="round" />
+                  </svg>
+                  <span className="text-[12.5px] text-ink">Route {r}</span>
+                </button>
               </li>
             ))}
 
@@ -200,11 +215,18 @@ export function RouteMapPanel() {
           </ul>
 
           <div className="mt-auto flex items-center gap-2 pt-2 text-[11.5px] text-inkSoft">
-            Last updated: 7:45 AM
+            Last updated: {updated}
+            <button
+              type="button"
+              aria-label="Refresh route positions"
+              onClick={() => setUpdated(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }))}
+              className="text-inkSoft hover:text-accent"
+            >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
               <path d="M21 12a9 9 0 1 1-2.6-6.4" strokeLinecap="round" />
               <path d="M21 3v6h-6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
+            </button>
           </div>
         </div>
 
@@ -266,13 +288,38 @@ export function RouteMapPanel() {
               <path d={overlapPath} fill="none" stroke={OVERLAP} strokeWidth="6" strokeLinecap="round" opacity="0.95" />
 
               {/* routes */}
-              {routes.map((r) => (
-                <path key={r.id} d={r.d} fill="none" stroke={ROUTE} strokeWidth="3.4" strokeLinecap="round" />
+              {routes.filter((r) => visible(r.id)).map((r) => (
+                <path
+                  key={r.id}
+                  d={r.d}
+                  fill="none"
+                  stroke={ROUTE}
+                  strokeWidth="3.4"
+                  strokeLinecap="round"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => onOpenRoute(routeRecord[r.id])}
+                >
+                  <title>Route {r.id}</title>
+                </path>
               ))}
 
               {/* customer stops */}
-              {routes.flatMap((r) =>
-                r.stops.map(([x, y], i) => <circle key={`${r.id}-${i}`} cx={x} cy={y} r="5" fill={ROUTE} stroke="#fff" strokeWidth="1.6" />),
+              {routes.filter((r) => visible(r.id)).flatMap((r) =>
+                r.stops.map(([x, y], i) => (
+                  <circle
+                    key={`${r.id}-${i}`}
+                    cx={x}
+                    cy={y}
+                    r="5"
+                    fill={ROUTE}
+                    stroke="#fff"
+                    strokeWidth="1.6"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => onOpenRoute(routeRecord[r.id])}
+                  >
+                    <title>Route {r.id} · stop {i + 1}</title>
+                  </circle>
+                )),
               )}
 
               {/* at-risk stop */}

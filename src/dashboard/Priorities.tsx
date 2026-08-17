@@ -1,6 +1,6 @@
 import { priorities, toneHex } from './data'
 
-export function Priorities({ selected, onSelect }: { selected: number | null; onSelect: (n: number) => void }) {
+export function Priorities({ selected, onSelect, onViewAll }: { selected: number | null; onSelect: (n: number) => void; onViewAll: () => void }) {
   return (
     <section className="panel">
       <div className="panel-head">
@@ -41,7 +41,7 @@ export function Priorities({ selected, onSelect }: { selected: number | null; on
       </ul>
 
       <div className="shrink-0 border-t border-lineSoft px-3.5 py-2.5">
-        <button type="button" className="cond flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.06em] text-info hover:underline">
+        <button type="button" onClick={onViewAll} className="cond flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.06em] text-info hover:underline">
           View all priorities (12)
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden>
             <path d="m9 5 7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />

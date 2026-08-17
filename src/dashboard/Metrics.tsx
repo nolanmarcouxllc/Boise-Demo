@@ -22,11 +22,15 @@ function Delta({ card }: { card: MetricCard }) {
   )
 }
 
-export function Metrics() {
+export function Metrics({ onOpen }: { onOpen: (id: string) => void }) {
   return (
     <div className="grid min-h-0 grid-cols-6 gap-2.5">
       {metrics.map((m) => (
-        <article key={m.id} className="flex min-w-0 items-center gap-3 rounded-card border border-line bg-white px-3.5">
+        <button
+          key={m.id}
+          type="button"
+          onClick={() => onOpen(m.id)}
+          className="flex min-w-0 items-center gap-3 rounded-card border border-line bg-white px-3.5 text-left transition-colors hover:border-accent">
           <span className="shrink-0">
             <MetricGlyph name={m.icon} color={toneHex[m.iconTone]} size={40} />
           </span>
@@ -35,7 +39,7 @@ export function Metrics() {
             <div className="num cond -mt-0.5 text-[34px] font-bold leading-[1.1] text-ink">{m.value}</div>
             <Delta card={m} />
           </div>
-        </article>
+        </button>
       ))}
     </div>
   )

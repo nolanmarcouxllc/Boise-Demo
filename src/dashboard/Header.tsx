@@ -7,11 +7,13 @@ export function Header({
   onPresentingChange,
   mode,
   onModeChange,
+  section,
 }: {
   presenting: boolean
   onPresentingChange: (v: boolean) => void
   mode: string
   onModeChange: (v: string) => void
+  section: string
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -31,7 +33,10 @@ export function Header({
         <h1 className="cond truncate text-[31px] font-bold uppercase leading-[1.05] tracking-[0.005em] text-ink">
           Westfield Branch Intelligence Command Center
         </h1>
-        <p className="mt-1 text-[13px] leading-tight text-inkSoft">Demonstration Environment — Sanitized Sample Data</p>
+        <p className="mt-1 text-[13px] leading-tight text-inkSoft">
+          Demonstration Environment — Sanitized Sample Data
+          {section !== 'Branch Overview' && <span className="cond ml-2 font-bold uppercase tracking-[0.07em] text-accent">· {section}</span>}
+        </p>
       </div>
 
       <div className="flex shrink-0 items-center gap-4" style={{ paddingTop: 6 }}>

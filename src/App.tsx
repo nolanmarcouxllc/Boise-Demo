@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { AgentActivity } from './dashboard/AgentActivity'
 import { CapacityChart } from './dashboard/CapacityChart'
+import { Drawer, type Detail } from './dashboard/Drawer'
 import { Header } from './dashboard/Header'
 import { ManagementBrief } from './dashboard/ManagementBrief'
 import { Metrics } from './dashboard/Metrics'
@@ -8,6 +9,14 @@ import { Priorities } from './dashboard/Priorities'
 import { RouteMapPanel } from './dashboard/RouteMapPanel'
 import { Sidebar } from './dashboard/Sidebar'
 import type { NavItem } from './dashboard/data'
+import { AgentNetworkView } from './dashboard/views/AgentNetworkView'
+import { DiscoveryBoardView } from './dashboard/views/DiscoveryBoardView'
+import { ExceptionsView } from './dashboard/views/ExceptionsView'
+import { ManagementBriefView } from './dashboard/views/ManagementBriefView'
+import { OrderFlowView } from './dashboard/views/OrderFlowView'
+import { PlannedActualView } from './dashboard/views/PlannedActualView'
+import { RouteLabView } from './dashboard/views/RouteLabView'
+import { TransportationView } from './dashboard/views/TransportationView'
 
 /**
  * Column weights are taken from the reference: the map spans the first two
@@ -79,46 +88,81 @@ export default function App() {
   const [priority, setPriority] = useState<number | null>(null)
   const [agent, setAgent] = useState<string | null>(null)
   const [showWhy, setShowWhy] = useState(false)
+  const [detail, setDetail] = useState<Detail | null>(null)
 
   const scale = useCanvasScale()
+  const open = (d: Detail) => setDetail(d)
 
   return (
     <div className="flex h-screen w-screen items-center justify-center overflow-hidden bg-white">
-    <div
-      className="flex flex-col overflow-hidden bg-white"
-      style={{
-        width: CANVAS_W,
-        height: CANVAS_H,
-        flex: 'none',
-        transform: `scale(${scale})`,
-        transformOrigin: 'center center',
-      }}
-    >
-      <div className="grid min-h-0 flex-1 grid-cols-[255px_1fr]">
-        <Sidebar active={nav} onSelect={setNav} />
+      <div
+        className="relative flex flex-col overflow-hidden bg-white"
+        style={{
+          width: CANVAS_W,
+          height: CANVAS_H,
+          flex: 'none',
+          transform: `scale(${scale})`,
+          transformOrigin: 'center center',
+        }}
+      >
+        <div className="grid min-h-0 flex-1 grid-cols-[255px_1fr]">
+          <Sidebar
+            active={nav}
+            onSelect={(n) => {
+              setNav(n)
+              setDetail(null)
+            }}
+          />
 
-        <div className="grid min-h-0 min-w-0 grid-rows-[82px_1fr]">
-          <Header presenting={presenting} onPresentingChange={setPresenting} mode={mode} onModeChange={setMode} />
+          <div className="grid min-h-0 min-w-0 grid-rows-[82px_1fr]">
+            <Header
+              presenting={presenting}
+              onPresentingChange={setPresenting}
+              mode={mode}
+              onModeChange={setMode}
+              section={nav}
+            />
 
-          <div className="grid min-h-0 grid-rows-[104px_minmax(0,398px)_minmax(0,398px)] content-start gap-2.5 px-[18px] pb-3">
-            <Metrics />
+            {nav === 'Branch Overview' ? (
+              <div className="grid min-h-0 grid-rows-[104px_minmax(0,398px)_minmax(0,398px)] content-start gap-2.5 px-[18px] pb-3">
+                <Metrics onOpen={(id) => open({ kind: 'metric', id })} />
 
-            <div className={`grid min-h-0 gap-2.5 ${COLS}`}>
-              <RouteMapPanel />
-              <Priorities selected={priority} onSelect={(n) => setPriority((p) => (p === n ? null : n))} />
-            </div>
+                <div className={`grid min-h-0 gap-2.5 ${COLS}`}>
+                  <RouteMapPanel onOpenRoute={(id) => open({ kind: 'route', id })} />
+                  <Priorities
+                    selected={priority}
+                    onSelect={(n) => {
+                      setPriority(n)
+                      open({ kind: 'priority', id: n })
+                    }}
+                    onViewAll={() => open({ kind: 'allPriorities' })}
+                  />
+                </div>
 
-            <div className={`grid min-h-0 gap-2.5 ${COLS}`}>
-              <AgentActivity selected={agent} onSelect={(id) => setAgent((a) => (a === id ? null : id))} />
-              <ManagementBrief showWhy={showWhy} onToggle={() => setShowWhy((v) => !v)} />
-              <CapacityChart />
-            </div>
+                <div className={`grid min-h-0 gap-2.5 ${COLS}`}>
+                  <AgentActivity selected={agent} onSelect={setAgent} onOpen={(id) => open({ kind: 'agent', id })} />
+                  <ManagementBrief showWhy={showWhy} onToggle={() => setShowWhy((v) => !v)} />
+                  <CapacityChart />
+                </div>
+              </div>
+            ) : (
+              <div className="grid min-h-0 px-[18px] pb-3">
+                {nav === 'Agent Network' && <AgentNetworkView onOpen={open} />}
+                {nav === 'Order Flow' && <OrderFlowView />}
+                {nav === 'Transportation' && <TransportationView onOpen={open} />}
+                {nav === 'Exceptions' && <ExceptionsView onOpen={open} />}
+                {nav === 'Route Lab' && <RouteLabView />}
+                {nav === 'Planned vs. Actual' && <PlannedActualView />}
+                {nav === 'Management Brief' && <ManagementBriefView onOpen={open} />}
+                {nav === 'Discovery Board' && <DiscoveryBoardView />}
+              </div>
+            )}
           </div>
         </div>
-      </div>
 
-      <WoodAccent />
-    </div>
+        <WoodAccent />
+        <Drawer detail={detail} onClose={() => setDetail(null)} onOpen={open} />
+      </div>
     </div>
   )
 }
