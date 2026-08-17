@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-[#faf9f6] text-charcoal-800 antialiased;
+    font-feature-settings: 'tnum' 1, 'cv05' 1;
+    overflow-x: hidden;
+  }
+
+  /* Visible focus for keyboard users everywhere. */
+  :focus-visible {
+    outline: 3px solid #215733;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-charcoal-900;
+    text-wrap: balance;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f0efe9;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #c4c8c8;
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9aa0a0;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply rounded-md border border-charcoal-200/70 bg-white shadow-panel;
+  }
+
+  .panel-header {
+    @apply flex items-center justify-between gap-3 border-b border-charcoal-200/70 px-4 py-3;
+  }
+
+  .panel-title {
+    @apply text-[13px] font-semibold uppercase tracking-[0.09em] text-charcoal-500;
+  }
+
+  .stat-value {
+    @apply font-mono text-2xl font-semibold tabular-nums text-charcoal-900;
+  }
+
+  .label-caps {
+    @apply text-[11px] font-semibold uppercase tracking-[0.11em] text-charcoal-400;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-[3px] border text-sm font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-45;
+  }
+  .btn-primary {
+    @apply border-forest-700 bg-forest-700 px-4 py-2 text-white hover:bg-forest-600;
+  }
+  .btn-secondary {
+    @apply border-charcoal-300 bg-white px-4 py-2 text-charcoal-700 hover:border-charcoal-400 hover:bg-charcoal-50;
+  }
+  .btn-dark {
+    @apply border-charcoal-800 bg-charcoal-800 px-4 py-2 text-white hover:bg-charcoal-700;
+  }
+  .btn-ghost {
+    @apply border-transparent px-3 py-1.5 text-charcoal-600 hover:bg-charcoal-100;
+  }
+  .btn-sm {
+    @apply px-3 py-1.5 text-[13px];
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-[3px] border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em];
+  }
+
+  .data-row {
+    @apply border-b border-charcoal-100 last:border-0;
+  }
+
+  .link-underline {
+    @apply underline decoration-charcoal-300 underline-offset-4 hover:decoration-forest-600;
+  }
+
+  /* Presentation mode scales body copy for conference-room reading distance. */
+  .presenting {
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .presenting .panel-title {
+    @apply text-[15px];
+  }
+  .presenting .label-caps {
+    @apply text-[13px];
+  }
+  .presenting .stat-value {
+    @apply text-4xl;
+  }
+  .presenting .chip {
+    @apply text-[13px] px-2.5 py-1;
+  }
+  .presenting .btn {
+    @apply text-base;
+  }
+  .presenting .pres-body {
+    @apply text-lg leading-relaxed;
+  }
+  .presenting .pres-hide {
+    display: none;
+  }
+}
+
+@layer utilities {
+  .grid-paper {
+    background-image: linear-gradient(rgba(26, 69, 40, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(26, 69, 40, 0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Leaflet container defaults — the plugin CSS is imported in the map component. */
+.leaflet-container {
+  background: #eceadf;
+  font-family: inherit;
+}
+.leaflet-bar a {
+  color: #242929 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
