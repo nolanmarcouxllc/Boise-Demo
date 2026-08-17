@@ -3,10 +3,13 @@
 <style>
   /* ---------------------------------------------------------------- tokens
      Light is the complete palette. Dark redefines only these values, twice, so
-     it works for an OS preference and for an explicit toggle. */
+     it works for an OS preference and for an explicit toggle. The masthead and
+     closing panel are a committed dark surface in BOTH themes, so they carry
+     their own ink tokens and never invert against their own text. */
   :root {
     --ground: #faf9f6;
     --surface: #ffffff;
+    --sunken: #f3f2ec;
     --ink: #14181a;
     --ink-soft: #5a6360;
     --line: #dcdcd4;
@@ -19,12 +22,16 @@
     --band-ink: #ffffff;
     --band-ink-soft: #d8e6dc;
     --band-eyebrow: #a9c8b3;
+    --btn-bg: #215733;
+    --btn-bg-hover: #1a4528;
+    --btn-ink: #ffffff;
     --shadow: 0 1px 2px rgba(20, 24, 26, 0.05), 0 6px 20px rgba(20, 24, 26, 0.05);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme='light']) {
       --ground: #121613;
       --surface: #1a201c;
+      --sunken: #141a16;
       --ink: #f0f2ee;
       --ink-soft: #a3aca7;
       --line: #2c352f;
@@ -37,12 +44,16 @@
       --band-ink: #f3f7f3;
       --band-ink-soft: #bcd2c3;
       --band-eyebrow: #8fb79c;
+      --btn-bg: #9ccbaa;
+      --btn-bg-hover: #b6dcc2;
+      --btn-ink: #0f1f15;
       --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 20px rgba(0, 0, 0, 0.3);
     }
   }
   :root[data-theme='dark'] {
     --ground: #121613;
     --surface: #1a201c;
+    --sunken: #141a16;
     --ink: #f0f2ee;
     --ink-soft: #a3aca7;
     --line: #2c352f;
@@ -55,6 +66,9 @@
     --band-ink: #f3f7f3;
     --band-ink-soft: #bcd2c3;
     --band-eyebrow: #8fb79c;
+    --btn-bg: #9ccbaa;
+    --btn-bg-hover: #b6dcc2;
+    --btn-ink: #0f1f15;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 20px rgba(0, 0, 0, 0.3);
   }
 
@@ -73,11 +87,7 @@
   p { margin: 0; }
   :focus-visible { outline: 3px solid var(--brand-ink); outline-offset: 3px; }
 
-  .wrap {
-    max-width: 1120px;
-    margin: 0 auto;
-    padding: 0 28px;
-  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
   .stack { display: flex; flex-direction: column; }
 
   .eyebrow {
@@ -89,11 +99,7 @@
   }
 
   /* ---------------------------------------------------------------- header */
-  header.top {
-    background: var(--band);
-    color: var(--band-ink);
-    padding: 40px 0 44px;
-  }
+  header.top { background: var(--band); color: var(--band-ink); padding: 40px 0 44px; }
   header.top h1 {
     color: var(--band-ink);
     font-size: clamp(34px, 5vw, 56px);
@@ -109,23 +115,12 @@
     margin-top: 18px;
   }
   header.top .eyebrow { color: var(--band-eyebrow); }
-  .mark {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    width: 46px;
-  }
+  .mark { display: flex; flex-direction: column; gap: 4px; width: 46px; }
   .mark span { height: 5px; border-radius: 2px; background: #caa672; }
   .mark span:nth-child(2) { background: #7fa889; }
   .mark span:nth-child(3) { width: 62%; background: #f0e4d2; }
 
-  /* ---------------------------------------------------------------- counts */
-  .counts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    margin-top: 34px;
-  }
+  .counts { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
   .count {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -141,16 +136,27 @@
     font-variant-numeric: tabular-nums;
     color: var(--band-ink);
   }
-  .count span {
-    display: block;
-    font-size: 15px;
+  .count span { display: block; font-size: 15px; color: var(--band-ink-soft); margin-top: 2px; }
+
+  .disclaimer {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     color: var(--band-ink-soft);
-    margin-top: 2px;
+    border-radius: 3px;
+    padding: 7px 13px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
+  .disclaimer::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #caa672; }
 
   /* ---------------------------------------------------------------- section */
   section { padding: 56px 0; }
-  .section-head { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+  .section-head { display: flex; flex-direction: column; gap: 10px; margin-bottom: 26px; }
   .section-head h2 {
     font-size: clamp(26px, 3.4vw, 38px);
     line-height: 1.15;
@@ -159,18 +165,49 @@
   }
   .section-head p { color: var(--ink-soft); font-size: 19px; max-width: 62ch; }
 
+  /* ---------------------------------------------------------------- buttons */
+  .btn {
+    font: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 3px;
+    border: 1px solid var(--btn-bg);
+    background: var(--btn-bg);
+    color: var(--btn-ink);
+    padding: 9px 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 140ms ease, border-color 140ms ease;
+  }
+  .btn:hover { background: var(--btn-bg-hover); border-color: var(--btn-bg-hover); }
+  .btn[disabled] { cursor: progress; opacity: 0.72; }
+  .btn.ghost { background: transparent; color: var(--ink-soft); border-color: var(--line); }
+  .btn.ghost:hover { background: var(--sunken); border-color: var(--ink-soft); color: var(--ink); }
+  .btn .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    flex: none;
+  }
+  .btn[data-state='running'] .dot { animation: blink 900ms ease-in-out infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 26px; }
+  .toolbar .hint { font-size: 15px; color: var(--ink-soft); }
+
   /* ---------------------------------------------------------------- ten */
-  .ten { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+  .ten { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
   .agent {
-    display: grid;
-    grid-template-columns: 76px minmax(0, 1fr);
-    gap: 20px;
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 4px;
-    padding: 24px 24px 22px;
+    padding: 24px;
     box-shadow: var(--shadow);
   }
+  .agent .head { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 20px; }
   .agent .num {
     font-size: 58px;
     line-height: 0.9;
@@ -186,15 +223,104 @@
     font-weight: 750;
     letter-spacing: -0.01em;
   }
-  .agent .does { margin-top: 8px; font-size: 18px; color: var(--ink); }
-  .agent .eg {
-    margin-top: 14px;
-    padding-top: 12px;
-    border-top: 1px dashed var(--line);
+  .agent .does { margin-top: 8px; font-size: 18px; }
+  .agent .actions { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* ---------------------------------------------------------------- sim */
+  .sim {
+    margin-top: 18px;
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+  }
+  .sim[hidden] { display: none; }
+  .sim .simlabel {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+  .steps { list-style: none; margin: 0 0 4px; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+  .steps li {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 9px;
+    align-items: start;
     font-size: 16px;
     color: var(--ink-soft);
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 260ms ease, transform 260ms ease;
   }
-  .agent .eg b { color: var(--brand-ink); font-weight: 700; }
+  .steps li.on { opacity: 1; transform: none; }
+  .steps li .tick {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+    font-size: 12px;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+    margin-top: 2px;
+  }
+
+  .result {
+    margin-top: 14px;
+    background: var(--sunken);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--brand-ink);
+    border-radius: 0 4px 4px 0;
+    padding: 16px 18px;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: opacity 300ms ease, transform 300ms ease;
+  }
+  .result.on { opacity: 1; transform: none; }
+  .result .found {
+    font-size: 19px;
+    font-weight: 750;
+    line-height: 1.25;
+    color: var(--ink);
+  }
+  .result .detail { margin-top: 7px; font-size: 16px; color: var(--ink-soft); }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+  .chip {
+    background: var(--brand-soft);
+    color: var(--brand-ink);
+    border: 1px solid color-mix(in srgb, var(--brand-ink) 25%, transparent);
+    border-radius: 3px;
+    padding: 4px 10px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .suggest { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 16px; }
+  .suggest .k {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    display: block;
+    margin-bottom: 3px;
+  }
+  .caveat { margin-top: 10px; font-size: 15px; color: var(--ink-soft); font-style: italic; }
+  .waiting {
+    margin-top: 14px;
+    background: var(--band);
+    color: var(--band-ink);
+    border-radius: 3px;
+    padding: 10px 14px;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .waiting::before { content: ''; width: 9px; height: 9px; border-radius: 50%; background: #caa672; flex: none; }
+  .waiting span { font-weight: 400; color: var(--band-ink-soft); }
 
   /* ---------------------------------------------------------------- more */
   .more-band { background: var(--timber-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
@@ -239,22 +365,6 @@
 
   footer.bottom { padding: 34px 0 56px; color: var(--ink-soft); font-size: 15px; }
 
-  .disclaimer {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: var(--band-ink-soft);
-    border-radius: 3px;
-    padding: 7px 13px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .disclaimer::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #caa672; }
-
   @media (max-width: 900px) {
     .ten { grid-template-columns: minmax(0, 1fr); }
     .groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -263,8 +373,17 @@
     body { font-size: 17px; }
     .wrap { padding: 0 18px; }
     .groups { grid-template-columns: minmax(0, 1fr); }
-    .agent { grid-template-columns: 56px minmax(0, 1fr); gap: 14px; padding: 20px; }
+    .agent { padding: 20px; }
+    .agent .head { grid-template-columns: 56px minmax(0, 1fr); gap: 14px; }
     .agent .num { font-size: 42px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
   }
 </style>
 
@@ -273,10 +392,10 @@
     <div class="mark" aria-hidden="true"><span></span><span></span><span></span></div>
     <div class="eyebrow" style="margin-top: 20px">Westfield Branch · Building Materials Distribution</div>
     <h1>Ten helpers that watch the branch all day.</h1>
-    <p class="lede">Each one does a single job. None of them decide anything on their own.</p>
+    <p class="lede">Press the button on any one to watch it do a test run.</p>
 
     <div class="counts">
-      <div class="count"><b>10</b><span>Built in the demonstration</span></div>
+      <div class="count"><b>10</b><span>You can test each one</span></div>
       <div class="count"><b>30</b><span>More the same system could do</span></div>
       <div class="count"><b>0</b><span>Decisions taken without a person</span></div>
     </div>
@@ -291,101 +410,17 @@
   <div class="wrap">
     <div class="section-head">
       <div class="eyebrow">The ten</div>
-      <h2>What each one watches for</h2>
-      <p>Every example below comes from the sample day in the demonstration. Real numbers, made-up branch.</p>
+      <h2>Try one. See what it would find.</h2>
+      <p>Each test run reads the same made-up day: 30 orders, 10 routes, 8 trucks. Watch it work, see what it found, then see who has to say yes.</p>
     </div>
 
-    <div class="ten">
-      <article class="agent">
-        <div class="num" aria-hidden="true">1</div>
-        <div>
-          <h3>Two trips become one</h3>
-          <p class="does">Finds orders heading the same direction so one truck can take them all.</p>
-          <p class="eg">Three orders near Northampton. <b>One truck instead of two. 74 fewer miles.</b></p>
-        </div>
-      </article>
-
-      <article class="agent">
-        <div class="num" aria-hidden="true">2</div>
-        <div>
-          <h3>Same stop twice</h3>
-          <p class="does">Notices when two trucks are sent to the same customer on the same day.</p>
-          <p class="eg">Two trucks to the same yard, <b>95 minutes apart.</b></p>
-        </div>
-      </article>
-
-      <article class="agent">
-        <div class="num" aria-hidden="true">3</div>
-        <div>
-          <h3>Missing details</h3>
-          <p class="does">Checks an order has everything routing needs before anyone plans it.</p>
-          <p class="eg">Four orders had <b>no delivery window or no unload equipment.</b></p>
-        </div>
-      </article>
-
-      <article class="agent">
-        <div class="num" aria-hidden="true">4</div>
-        <div>
-          <h3>Trucks on the same road</h3>
-          <p class="does">Shows where two routes drive the same stretch of highway.</p>
-          <p class="eg">Two routes share <b>31 miles in each direction.</b></p>
-        </div>
-      </article>
-
-      <article class="agent">
-        <div class="num" aria-hidden="true">5</div>
-        <div>
-          <h3>Who takes what</h3>
-          <p class="does">Lays out a few ways to split the work between trucks, and what each way costs.</p>
-          <p class="eg">Three plans: <b>fewest miles, best on-time, fullest trucks.</b></p>
-        </div>
-      </article>
-
-      <article class="agent">
-        <div class="num" aria-hidden="true">6</div>
-        <div>
-          <h3>Something changed late</h3>
-          <p class="does">When an order changes after planning, shows what it breaks.</p>
-          <p class="eg">Six units added while the truck was loading. <b>The load order has to change.</b></p>
-        </div>
-      </article>
-
-      <article class="agent">
-        <div class="num" aria-hidden="true">7</div>
-        <div>
-          <h3>Our truck or hire one</h3>
-          <p class="does">Says which is better, and why the cheaper one is not always right.</p>
-          <p class="eg">Keep one route. Hire out another — <b>our truck can't unload it.</b></p>
-        </div>
-      </article>
-
-      <article class="agent">
-        <div class="num" aria-hidden="true">8</div>
-        <div>
-          <h3>What really happened</h3>
-          <p class="does">Compares the plan to the actual day, so next week's plan is closer.</p>
-          <p class="eg">One stop ran 48 minutes long — <b>and has run long 4 of the last 6 times.</b></p>
-        </div>
-      </article>
-
-      <article class="agent">
-        <div class="num" aria-hidden="true">9</div>
-        <div>
-          <h3>One list of problems</h3>
-          <p class="does">Everything that needs attention in one place, with a name against each one.</p>
-          <p class="eg">15 things today. 5 urgent. <b>1 with nobody's name on it.</b></p>
-        </div>
-      </article>
-
-      <article class="agent">
-        <div class="num" aria-hidden="true">10</div>
-        <div>
-          <h3>The morning summary</h3>
-          <p class="does">One short page for the manager. Click any line to see what it is based on.</p>
-          <p class="eg">Three decisions waiting <b>before the trucks leave the yard.</b></p>
-        </div>
-      </article>
+    <div class="toolbar">
+      <button class="btn" type="button" id="runAll"><span class="dot"></span> Run all ten</button>
+      <button class="btn ghost" type="button" id="resetAll">Clear results</button>
+      <span class="hint">Nothing here changes anything. It is a rehearsal on sample data.</span>
     </div>
+
+    <div class="ten" id="ten"></div>
   </div>
 </section>
 
@@ -395,7 +430,7 @@
       <div class="section-head">
         <div class="eyebrow" style="color: var(--timber)">And thirty more</div>
         <h2>The same idea, pointed at the rest of the branch.</h2>
-        <p>These are not built. They are on this page to show how much of the day works the same way — something watches, something notices, a person decides.</p>
+        <p>These are not built, so there is nothing to test yet. They are here to show how much of the day works the same way — something watches, something notices, a person decides.</p>
       </div>
 
       <div class="groups">
@@ -409,7 +444,6 @@
             <li><b>Cutoff warning</b><span>Which orders will miss today's cutoff.</span></li>
           </ul>
         </div>
-
         <div class="group">
           <h3>Yard and loading</h3>
           <ul>
@@ -419,7 +453,6 @@
             <li><b>Damage spots</b><span>Where product keeps getting damaged.</span></li>
           </ul>
         </div>
-
         <div class="group">
           <h3>Trucks and drivers</h3>
           <ul>
@@ -430,7 +463,6 @@
             <li><b>Sitting and waiting</b><span>Where trucks lose time doing nothing.</span></li>
           </ul>
         </div>
-
         <div class="group">
           <h3>Money</h3>
           <ul>
@@ -440,7 +472,6 @@
             <li><b>Too small to deliver</b><span>Orders that cost more than they earn.</span></li>
           </ul>
         </div>
-
         <div class="group">
           <h3>Customers</h3>
           <ul>
@@ -450,7 +481,6 @@
             <li><b>Chase the appointment</b><span>Delivery windows nobody confirmed.</span></li>
           </ul>
         </div>
-
         <div class="group">
           <h3>Inventory</h3>
           <ul>
@@ -459,7 +489,6 @@
             <li><b>Match what's coming in</b><span>Inbound loads against waiting orders.</span></li>
           </ul>
         </div>
-
         <div class="group">
           <h3>Rules and safety</h3>
           <ul>
@@ -468,7 +497,6 @@
             <li><b>Repeat incidents</b><span>Where the same thing keeps happening.</span></li>
           </ul>
         </div>
-
         <div class="group">
           <h3>People</h3>
           <ul>
@@ -485,13 +513,13 @@
   <div class="wrap stack" style="gap: 22px">
     <div class="closing">
       <h2>The system catches it. The person decides it.</h2>
-      <p>Not one of these forty sends a truck, changes an order, or calls a customer on its own. They notice, they explain, and they wait for someone to say yes.</p>
+      <p>Every test run ends the same way — with a name and a question. Not one of these forty sends a truck, changes an order, or calls a customer on its own.</p>
     </div>
 
     <div class="note">
-      <b>What this is.</b> A working concept built on made-up orders, customers and routes, to show what a connected view could look like. Nothing is
-      connected to Boise Cascade's real systems, and none of the numbers describe the real Westfield branch. The next step is a working session with
-      operations and IT to find out which of these are worth building — and which are wrong.
+      <b>What this is.</b> A working concept built on made-up orders, customers and routes. The test runs replay a sample day so you can see the shape of
+      the work — they are not connected to Boise Cascade's real systems, and none of the numbers describe the real Westfield branch. The next step is a
+      working session with operations and IT to find out which of these are worth building, and which are wrong.
     </div>
   </div>
 </section>
@@ -499,3 +527,241 @@
 <footer class="bottom">
   <div class="wrap">Westfield Branch Intelligence Command Center · demonstration concept · simulated data throughout</div>
 </footer>
+
+<script>
+  // Each entry is one agent's rehearsal against the sample day. The numbers match
+  // the detailed demonstration so the two never contradict each other.
+  const AGENTS = [
+    {
+      n: 1,
+      title: 'Two trips become one',
+      does: 'Finds orders heading the same direction so one truck can take them all.',
+      steps: ['Reading 30 open orders', 'Grouping them by delivery area', 'Checking truck space and delivery windows', 'Comparing against today’s plan'],
+      found: 'Three orders going to the same corner of the map.',
+      detail: 'Northampton, Amherst and a Hadley job site — all within 18 miles, all on the same day. They are sitting on two different trucks.',
+      chips: ['1 truck freed', '74 fewer miles', '3.2 driver hours'],
+      suggest: 'Put all three on Route 1 and drop Route 12 for the day.',
+      caveat: 'This customer will not allow two purchase orders on one piece of paperwork — same truck is fine, same paperwork is not.',
+      waiting: 'Dispatcher',
+    },
+    {
+      n: 2,
+      title: 'Same stop twice',
+      does: 'Notices when two trucks are sent to the same customer on the same day.',
+      steps: ['Reading today’s 10 routes', 'Listing every planned arrival', 'Matching them by customer and address', 'Measuring the gap between arrivals'],
+      found: 'Two trucks booked into the same yard.',
+      detail: 'Route 1 pulls in at 07:40. Route 12 pulls into the same gate at 09:15. Ninety-five minutes apart, two drivers, one dock.',
+      chips: ['1 duplicate arrival', '35 min of gate time'],
+      suggest: 'Ask the yard whether they can take both loads in one visit.',
+      caveat: '',
+      waiting: 'Dispatcher',
+    },
+    {
+      n: 3,
+      title: 'Missing details',
+      does: 'Checks an order has everything routing needs before anyone plans it.',
+      steps: ['Opening all 30 orders', 'Checking address, window, equipment and length', 'Comparing each gap to the customer’s file'],
+      found: 'Four orders are missing something routing needs.',
+      detail: 'One has no map location. One has no delivery window. Two do not say what equipment is needed to get it off the truck.',
+      chips: ['4 orders', 'about 38 minutes of fixing'],
+      suggest: 'Show each gap to the person who wrote the order, with the stored answer already filled in so they only have to confirm it.',
+      caveat: 'A stored answer can be wrong for a job site that moves week to week. It gets confirmed, never applied quietly.',
+      waiting: 'Inside sales lead',
+    },
+    {
+      n: 4,
+      title: 'Trucks on the same road',
+      does: 'Shows where two routes drive the same stretch of highway.',
+      steps: ['Drawing all 10 routes for today', 'Laying the corridors over each other', 'Measuring the miles they share'],
+      found: 'Two pairs of routes are covering the same road.',
+      detail: 'Route 1 and Route 12 share 31 miles in each direction. Route 8 and Route 11 share a 34-mile stretch within 75 minutes of each other.',
+      chips: ['96 shared miles', '2 route pairs'],
+      suggest: 'Group the northern run under one truck. Leave the Hartford pair alone.',
+      caveat: 'Combining the Hartford pair would push a driver past a 10-hour day, so it stays as evidence rather than a proposal.',
+      waiting: 'Transportation supervisor',
+    },
+    {
+      n: 5,
+      title: 'Who takes what',
+      does: 'Lays out a few ways to split the work between trucks, and what each way costs.',
+      steps: ['Taking 5 orders in the north corridor', 'Checking the 2 trucks that are free', 'Applying 10 rules — windows, lengths, equipment', 'Building the workable options'],
+      found: 'Three plans that all work, none of them free.',
+      detail: 'Fewest miles saves 74 but arrives late at one stop. Best on-time keeps both trucks out. Fullest trucks needs a unit short enough for the Amherst yard.',
+      chips: ['3 plans', '10 rules checked'],
+      suggest: 'Pick one and send it to the routing system to build the real plan.',
+      caveat: 'This does not replace the routing system. It gets the inputs right and explains the trade-off.',
+      waiting: 'Dispatcher',
+    },
+    {
+      n: 6,
+      title: 'Something changed late',
+      does: 'When an order changes after planning, shows what it breaks.',
+      steps: ['Watching for changes made after planning', 'Caught one at 06:12 — six units added', 'Re-checking weight, deck space and stop order', 'Checking the delivery appointment'],
+      found: 'Six units were added while the truck was already loading.',
+      detail: 'The weight is fine — 420 lbs on a truck with room. But that bundle now has to load last so it comes off first, and that stop only has a 90-minute window.',
+      chips: ['+420 lbs', '+8 minutes', 'load order changes'],
+      suggest: 'Re-stack the load and keep both stops. Or deliver the six extra units tomorrow.',
+      caveat: 'Re-stacking delays departure, and this is the tightest appointment on the board today.',
+      waiting: 'Dispatcher',
+    },
+    {
+      n: 7,
+      title: 'Our truck or hire one',
+      does: 'Says which is better, and why the cheaper one is not always right.',
+      steps: ['Looking at 2 routes flagged for review', 'Checking our trucks and driver hours', 'Checking approved carrier rates', 'Checking what each site needs to unload'],
+      found: 'Keep one route. Hire the other one out.',
+      detail: 'Route 5 stays ours — the truck is back by 09:15 for a second run and it is our only long deck. Route 11 goes out, because our truck has no boom and that site cannot get the load off without one.',
+      chips: ['$116 more to hire out', 'but it can actually be delivered'],
+      suggest: 'Send Route 11 to the approved carrier that has a boom truck.',
+      caveat: 'The cheaper option here is the one that fails. Price is not the deciding factor.',
+      waiting: 'Transportation supervisor',
+    },
+    {
+      n: 8,
+      title: 'What really happened',
+      does: 'Compares the plan to the actual day, so next week’s plan is closer.',
+      steps: ['Reading 14 days of finished routes', 'Comparing planned time to actual time', 'Grouping the gaps by location', 'Looking for the ones that repeat'],
+      found: 'One stop that is always slow.',
+      detail: 'It was planned for 55 minutes and took 103. It has run over on four of its last six deliveries. The real average is 81 minutes.',
+      chips: ['71 min late route', '48 min at one stop', '4 of 6 deliveries'],
+      suggest: 'Change the planned time from 55 to 95 minutes so the rest of the route stops absorbing the difference.',
+      caveat: 'Six deliveries is a small sample. The rule gets reviewed, not set and forgotten.',
+      waiting: 'Transportation supervisor',
+    },
+    {
+      n: 9,
+      title: 'One list of problems',
+      does: 'Everything that needs attention in one place, with a name against each one.',
+      steps: ['Collecting from the other nine helpers', 'Sorting by how urgent each one is', 'Checking every owner and deadline'],
+      found: 'Fifteen things need attention today.',
+      detail: 'Five are urgent. Two are already past their deadline. One has nobody’s name on it at all.',
+      chips: ['15 open', '5 urgent', '2 overdue', '1 unassigned'],
+      suggest: 'Put a name on the unassigned one, and escalate the two that are late.',
+      caveat: 'Escalating too early makes people ignore the list. The branch sets the threshold, not the system.',
+      waiting: 'Branch operations',
+    },
+    {
+      n: 10,
+      title: 'The morning summary',
+      does: 'One short page for the manager. Every line can be opened to see what it is based on.',
+      steps: ['Reading everything the other nine found', 'Dropping anything it cannot back up', 'Writing it out in five short parts'],
+      found: 'Three decisions are waiting on the manager.',
+      detail: 'Route 6 needs equipment. Route 11 needs a carrier. Route 12 could be combined. Between them: three trucks and 186 miles.',
+      chips: ['3 decisions', '3 trucks', '186 miles'],
+      suggest: 'Read the three and decide before the trucks leave the yard.',
+      caveat: 'If a line cannot be traced back to an order or a route, it does not go in the summary.',
+      waiting: 'Branch manager',
+    },
+  ]
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+
+  // ---------------------------------------------------------------- build cards
+  const host = document.getElementById('ten')
+  host.innerHTML = AGENTS.map((a) => `
+    <article class="agent" data-agent="${a.n}">
+      <div class="head">
+        <div class="num" aria-hidden="true">${a.n}</div>
+        <div>
+          <h3>${esc(a.title)}</h3>
+          <p class="does">${esc(a.does)}</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn run" type="button" aria-expanded="false" aria-controls="sim-${a.n}">
+          <span class="dot"></span> <span class="lbl">Run a test</span>
+        </button>
+      </div>
+      <div class="sim" id="sim-${a.n}" hidden aria-live="polite"></div>
+    </article>
+  `).join('')
+
+  // ---------------------------------------------------------------- run one
+  function runAgent(a) {
+    const card = host.querySelector(`[data-agent="${a.n}"]`)
+    const btn = card.querySelector('.run')
+    const lbl = btn.querySelector('.lbl')
+    const panel = card.querySelector('.sim')
+    if (btn.dataset.state === 'running') return Promise.resolve()
+
+    btn.dataset.state = 'running'
+    btn.disabled = true
+    lbl.textContent = 'Running…'
+    btn.setAttribute('aria-expanded', 'true')
+    panel.hidden = false
+    panel.innerHTML = `
+      <div class="simlabel">Test run · sample day</div>
+      <ul class="steps">
+        ${a.steps.map((s) => `<li><span class="tick" aria-hidden="true">✓</span><span>${esc(s)}</span></li>`).join('')}
+      </ul>
+      <div class="result">
+        <p class="found">${esc(a.found)}</p>
+        <p class="detail">${esc(a.detail)}</p>
+        <div class="chips">${a.chips.map((c) => `<span class="chip">${esc(c)}</span>`).join('')}</div>
+        <div class="suggest"><span class="k">What it suggests</span>${esc(a.suggest)}
+          ${a.caveat ? `<p class="caveat">${esc(a.caveat)}</p>` : ''}
+        </div>
+        <div class="waiting">Waiting on: ${esc(a.waiting)}&nbsp;<span>— nothing happens until they say yes</span></div>
+      </div>`
+
+    const steps = [...panel.querySelectorAll('.steps li')]
+    const result = panel.querySelector('.result')
+
+    const finish = () => {
+      btn.dataset.state = 'done'
+      btn.disabled = false
+      lbl.textContent = 'Run it again'
+    }
+
+    if (reduced) {
+      steps.forEach((s) => s.classList.add('on'))
+      result.classList.add('on')
+      finish()
+      return Promise.resolve()
+    }
+
+    return new Promise((resolve) => {
+      steps.forEach((s, i) => setTimeout(() => s.classList.add('on'), 260 + i * 420))
+      setTimeout(() => {
+        result.classList.add('on')
+        finish()
+        resolve()
+      }, 360 + steps.length * 420)
+    })
+  }
+
+  // ---------------------------------------------------------------- wiring
+  host.addEventListener('click', (e) => {
+    const btn = e.target.closest('.run')
+    if (!btn) return
+    const n = Number(btn.closest('[data-agent]').dataset.agent)
+    runAgent(AGENTS.find((a) => a.n === n))
+  })
+
+  document.getElementById('runAll').addEventListener('click', async (e) => {
+    const all = e.currentTarget
+    if (all.dataset.state === 'running') return
+    all.dataset.state = 'running'
+    all.disabled = true
+    for (const a of AGENTS) {
+      await runAgent(a)
+      if (!reduced) await new Promise((r) => setTimeout(r, 140))
+    }
+    all.dataset.state = ''
+    all.disabled = false
+  })
+
+  document.getElementById('resetAll').addEventListener('click', () => {
+    host.querySelectorAll('[data-agent]').forEach((card) => {
+      const btn = card.querySelector('.run')
+      const panel = card.querySelector('.sim')
+      if (btn.dataset.state === 'running') return
+      btn.dataset.state = ''
+      btn.querySelector('.lbl').textContent = 'Run a test'
+      btn.setAttribute('aria-expanded', 'false')
+      panel.hidden = true
+      panel.innerHTML = ''
+    })
+  })
+</script>
