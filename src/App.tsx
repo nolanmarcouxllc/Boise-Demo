@@ -158,10 +158,10 @@ export default function App() {
                 {nav === 'Intelligence Network' && <IntelligenceNetworkView onOpen={open} />}
                 {nav === 'Capability Value Map' && <CapabilityValueMapView onOpen={open} />}
                 {nav === 'Next Step' && <NextStepView />}
-                {nav === 'Order Flow' && <OrderFlowView />}
+                {nav === 'Order Flow' && <OrderFlowView onOpen={open} />}
                 {nav === 'Transportation' && <TransportationView onOpen={open} />}
                 {nav === 'Exceptions' && <ExceptionsView onOpen={open} />}
-                {nav === 'Route Lab' && <RouteLabView />}
+                {nav === 'Route Lab' && <RouteLabView onOpen={open} />}
                 {nav === 'Planned vs. Actual' && <PlannedActualView />}
                 {nav === 'Management Brief' && <ManagementBriefView onOpen={open} />}
                 {nav === 'Discovery Board' && <DiscoveryBoardView />}

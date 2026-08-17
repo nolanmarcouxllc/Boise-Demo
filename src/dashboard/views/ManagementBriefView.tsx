@@ -1,75 +1,110 @@
 import { useState } from 'react'
+import { briefClaimCount, briefSections, sectionTone, type BriefSection } from '../brief'
 import type { Detail } from '../Drawer'
-import { briefRows, toneHex } from '../data'
-import { BriefIcon } from '../icons'
-import { ViewPanel } from './shared'
+import { StatusChip } from './StatusChip'
 
-const TRACE: Array<{ claim: string; calc: string; links: Array<{ label: string; detail: Detail }> }> = [
-  {
-    claim: 'Route 12 is projected to miss the Hadley job-site appointment by seven minutes.',
-    calc: 'Planned departure 08:15 · actual 08:52 · 37 minutes late. Planned arrival 10:45 + 37 = 11:22 against a window closing at 11:15.',
-    links: [{ label: 'Route 12', detail: { kind: 'route', id: 'RT-12' } }, { label: 'EXC-003', detail: { kind: 'exception', id: 'EXC-003' } }],
-  },
-  {
-    claim: 'Route 5 is running a load plan that does not match the current order.',
-    calc: 'Route generated 05:12. Order revised 05:41. Difference: 14 pieces, 714 lbs.',
-    links: [{ label: 'Route 5', detail: { kind: 'route', id: 'RT-05' } }, { label: 'DEMO-10511', detail: { kind: 'order', id: 'DEMO-10511' } }],
-  },
-  {
-    claim: '186 planned miles are under review for elimination across four proposals.',
-    calc: '74 (Route 12 consolidation) + 42 (Worcester) + 28 (Windsor Locks) + 42 (Torrington) = 186 miles. Estimates, not committed savings.',
-    links: [{ label: 'Avoidable miles', detail: { kind: 'metric', id: 'avoidable-miles' } }],
-  },
-]
-
-export function ManagementBriefView({ onOpen }: { onOpen: (d: Detail) => void }) {
-  const [open, setOpen] = useState<number | null>(0)
+/**
+ * Six sections, one question each. Every claim opens to show the arithmetic
+ * behind it, so the brief can be challenged line by line in the meeting.
+ */
+function Section({ s, onOpen, expanded }: { s: BriefSection; onOpen: (d: Detail) => void; expanded: boolean }) {
+  const [open, setOpen] = useState<Set<number>>(() => new Set(expanded ? s.items.map((_, i) => i) : []))
+  const color = sectionTone[s.tone]
+  const toggle = (i: number) =>
+    setOpen((prev) => {
+      const next = new Set(prev)
+      if (!next.delete(i)) next.add(i)
+      return next
+    })
 
   return (
-    <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-2.5">
-      <ViewPanel title="Morning brief" right={<span className="meta">Prepared 07:00</span>} bodyClass="p-0">
-        <ul>
-          {briefRows.map((b) => (
-            <li key={b.title} className="border-b border-lineSoft px-3.5 py-3 last:border-0">
-              <div className="flex gap-3">
-                <span className="mt-0.5 shrink-0"><BriefIcon name={b.icon} color={toneHex[b.tone]} /></span>
-                <div className="min-w-0">
-                  <p className="text-[13px] font-semibold leading-tight text-ink">{b.title}</p>
-                  <p className="mt-1 text-[12px] leading-snug text-inkSoft">{b.detail}</p>
-                  <p className="mt-1.5 border-l-2 border-accent pl-2 text-[11.5px] leading-snug text-inkSoft">{b.why}</p>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </ViewPanel>
+    <section className="panel min-h-0">
+      <div className="panel-head" style={{ borderTopColor: color, borderTopWidth: 3 }}>
+        <div className="min-w-0">
+          <h2 className="panel-title truncate">{s.title}</h2>
+          <p className="mt-0.5 truncate text-[10.5px] italic leading-tight text-inkFaint">{s.question}</p>
+        </div>
+        <span className="num shrink-0 text-[11px] text-inkFaint">{s.items.length}</span>
+      </div>
 
-      <ViewPanel title="Trace every statement" right={<span className="meta">{TRACE.length} claims</span>} bodyClass="p-0">
-        <ul>
-          {TRACE.map((t, i) => (
-            <li key={t.claim} className="border-b border-lineSoft last:border-0">
-              <button type="button" onClick={() => setOpen(open === i ? null : i)} aria-expanded={open === i} className="flex w-full items-start gap-2.5 px-3.5 py-2.5 text-left hover:bg-shell">
-                <span aria-hidden className="mt-1.5 h-[7px] w-[7px] shrink-0 rounded-full bg-forest" />
-                <span className="min-w-0 flex-1 text-[12.5px] font-medium leading-snug text-ink">{t.claim}</span>
-                <span className="cond shrink-0 text-[10px] font-bold uppercase tracking-[0.08em] text-info">{open === i ? 'Hide' : 'Show'}</span>
-              </button>
-              {open === i && (
-                <div className="mx-3.5 mb-3 rounded-sm2 border border-line bg-shell px-3 py-2.5">
-                  <div className="cond text-[9.5px] font-bold uppercase tracking-[0.09em] text-inkFaint">Calculation</div>
-                  <p className="num mt-0.5 text-[11.5px] leading-snug text-inkSoft">{t.calc}</p>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {t.links.map((l) => (
-                      <button key={l.label} type="button" onClick={() => onOpen(l.detail)} className="cond rounded-sm2 border border-line bg-white px-2 py-1 text-[11px] font-semibold text-ink hover:border-accent hover:text-accent">
+      <ul className="scroll-thin min-h-0 flex-1 overflow-y-auto">
+        {s.items.map((it, i) => (
+          <li key={it.text} className="border-b border-lineSoft last:border-0">
+            <button
+              type="button"
+              onClick={() => toggle(i)}
+              aria-expanded={open.has(i)}
+              className="flex w-full items-start gap-2 px-3 py-2 text-left hover:bg-shell"
+            >
+              <span aria-hidden className="mt-[6px] h-[7px] w-[7px] shrink-0 rounded-full" style={{ backgroundColor: color }} />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[12px] font-medium leading-snug text-ink">{it.text}</span>
+                <span className="mt-1 flex items-center gap-1.5">
+                  <StatusChip status={it.status} />
+                  <span className="cond text-[9.5px] font-bold uppercase tracking-[0.08em] text-info">
+                    {open.has(i) ? 'Hide working' : 'Show working'}
+                  </span>
+                </span>
+              </span>
+            </button>
+
+            {open.has(i) && (
+              <div className="mx-3 mb-2.5 rounded-sm2 border border-line bg-shell px-2.5 py-2">
+                <div className="cond text-[9px] font-bold uppercase tracking-[0.09em] text-inkFaint">How this was worked out</div>
+                <p className="num mt-0.5 text-[11px] leading-snug text-inkSoft">{it.calc}</p>
+                {it.links && (
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {it.links.map((l) => (
+                      <button
+                        key={l.label}
+                        type="button"
+                        onClick={() => onOpen(l.detail)}
+                        className="cond rounded-sm2 border border-line bg-white px-2 py-[3px] text-[10.5px] font-semibold text-ink hover:border-accent hover:text-accent"
+                      >
                         {l.label}
                       </button>
                     ))}
                   </div>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      </ViewPanel>
+                )}
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+export function ManagementBriefView({ onOpen }: { onOpen: (d: Detail) => void }) {
+  // Open by default: the working behind each claim is the point of the brief,
+  // and a collapsed grid leaves the screen looking half-finished.
+  const [allOpen, setAllOpen] = useState(true)
+
+  return (
+    <div className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-2.5">
+      <div className="flex shrink-0 items-center justify-between rounded-card border border-line bg-shell px-3.5 py-2">
+        <p className="text-[12px] leading-snug text-inkSoft">
+          Prepared 07:00 for the Westfield branch manager.{' '}
+          <span className="text-ink">Every statement below can be opened to show the working behind it.</span>
+        </p>
+        <div className="flex shrink-0 items-center gap-3">
+          <span className="meta">{briefClaimCount} traceable statements</span>
+          <button
+            type="button"
+            onClick={() => setAllOpen((v) => !v)}
+            className="cond rounded-sm2 border border-line bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.07em] text-ink hover:border-accent hover:text-accent"
+          >
+            {allOpen ? 'Collapse all' : 'Expand all'}
+          </button>
+        </div>
+      </div>
+
+      <div className="grid min-h-0 grid-cols-3 grid-rows-2 gap-2.5">
+        {briefSections.map((s) => (
+          // Remounting on toggle lets one button drive every section's rows.
+          <Section key={`${s.key}-${allOpen}`} s={s} onOpen={onOpen} expanded={allOpen} />
+        ))}
+      </div>
     </div>
   )
 }
