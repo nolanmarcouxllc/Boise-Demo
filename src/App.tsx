@@ -9,7 +9,11 @@ import { Priorities } from './dashboard/Priorities'
 import { RouteMapPanel } from './dashboard/RouteMapPanel'
 import { Sidebar } from './dashboard/Sidebar'
 import type { NavItem } from './dashboard/data'
-import { AgentNetworkView } from './dashboard/views/AgentNetworkView'
+import { IntelligenceNetworkView } from './dashboard/views/IntelligenceNetworkView'
+import { CapabilityValueMapView } from './dashboard/views/CapabilityValueMapView'
+import { NextStepView } from './dashboard/views/NextStepView'
+import { StoryDeck } from './dashboard/StoryDeck'
+import { SystemStatus } from './dashboard/SystemStatus'
 import { DiscoveryBoardView } from './dashboard/views/DiscoveryBoardView'
 import { ExceptionsView } from './dashboard/views/ExceptionsView'
 import { ManagementBriefView } from './dashboard/views/ManagementBriefView'
@@ -83,12 +87,13 @@ function useCanvasScale() {
 
 export default function App() {
   const [nav, setNav] = useState<NavItem>('Branch Overview')
-  const [presenting, setPresenting] = useState(true)
+  const [presenting, setPresenting] = useState(false)
   const [mode, setMode] = useState('Explore Mode')
   const [priority, setPriority] = useState<number | null>(null)
   const [agent, setAgent] = useState<string | null>(null)
   const [showWhy, setShowWhy] = useState(false)
   const [detail, setDetail] = useState<Detail | null>(null)
+  const [statusOpen, setStatusOpen] = useState(false)
 
   const scale = useCanvasScale()
   const open = (d: Detail) => setDetail(d)
@@ -121,9 +126,12 @@ export default function App() {
               mode={mode}
               onModeChange={setMode}
               section={nav}
+              onOpenStatus={() => setStatusOpen(true)}
             />
 
-            {nav === 'Branch Overview' ? (
+            {presenting ? (
+              <StoryDeck onEnter={() => setPresenting(false)} />
+            ) : nav === 'Branch Overview' ? (
               <div className="grid min-h-0 grid-rows-[104px_minmax(0,398px)_minmax(0,398px)] content-start gap-2.5 px-[18px] pb-3">
                 <Metrics onOpen={(id) => open({ kind: 'metric', id })} />
 
@@ -147,7 +155,9 @@ export default function App() {
               </div>
             ) : (
               <div className="grid min-h-0 px-[18px] pb-3">
-                {nav === 'Agent Network' && <AgentNetworkView onOpen={open} />}
+                {nav === 'Intelligence Network' && <IntelligenceNetworkView onOpen={open} />}
+                {nav === 'Capability Value Map' && <CapabilityValueMapView onOpen={open} />}
+                {nav === 'Next Step' && <NextStepView />}
                 {nav === 'Order Flow' && <OrderFlowView />}
                 {nav === 'Transportation' && <TransportationView onOpen={open} />}
                 {nav === 'Exceptions' && <ExceptionsView onOpen={open} />}
@@ -162,6 +172,7 @@ export default function App() {
 
         <WoodAccent />
         <Drawer detail={detail} onClose={() => setDetail(null)} onOpen={open} />
+        <SystemStatus open={statusOpen} onClose={() => setStatusOpen(false)} />
       </div>
     </div>
   )

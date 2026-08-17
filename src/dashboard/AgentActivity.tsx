@@ -32,8 +32,8 @@ export function AgentActivity({
     <section className="panel" ref={wrap}>
       <div className="panel-head">
         <div className="flex items-baseline gap-2.5">
-          <h2 className="panel-title">Agent Activity</h2>
-          <span className="cond text-[10.5px] font-bold uppercase tracking-[0.07em] text-accent">10 Agents Online</span>
+          <h2 className="panel-title">Capability Activity</h2>
+          <span className="cond text-[10.5px] font-bold uppercase tracking-[0.07em] text-accent">10 Capabilities Monitoring</span>
         </div>
         <div className="flex items-center gap-3.5">
           {LEGEND.map((l) => (
@@ -49,8 +49,8 @@ export function AgentActivity({
         <table className="w-full table-fixed">
           <thead>
             <tr className="border-b border-lineSoft">
-              <th scope="col" className="cond w-[30%] px-3.5 py-[5px] text-left text-[10px] font-bold uppercase tracking-[0.08em] text-inkFaint">Agent</th>
-              <th scope="col" className="cond w-[21%] py-[5px] text-left text-[10px] font-bold uppercase tracking-[0.08em] text-inkFaint">Specialty</th>
+              <th scope="col" className="cond w-[30%] px-3.5 py-[5px] text-left text-[10px] font-bold uppercase tracking-[0.08em] text-inkFaint">Capability</th>
+              <th scope="col" className="cond w-[21%] py-[5px] text-left text-[10px] font-bold uppercase tracking-[0.08em] text-inkFaint">Department</th>
               <th scope="col" className="cond w-[17%] py-[5px] text-left text-[10px] font-bold uppercase tracking-[0.08em] text-inkFaint">Status</th>
               <th scope="col" className="cond py-[5px] text-left whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.08em] text-inkFaint">Latest Activity (7:45 AM)</th>
               <th scope="col" className="w-[26px]"><span className="sr-only">Actions</span></th>
@@ -94,7 +94,7 @@ export function AgentActivity({
                   </button>
                   {menu === a.id && (
                     <div className="absolute right-2 top-full z-40 w-40 overflow-hidden rounded-sm2 border border-line bg-white py-1 text-left shadow-lg">
-                      {['Open agent detail', 'View findings', 'Mute for today'].map((label) => (
+                      {['Open capability detail', 'View operational finding', 'Mute for today'].map((label) => (
                         <button
                           key={label}
                           type="button"

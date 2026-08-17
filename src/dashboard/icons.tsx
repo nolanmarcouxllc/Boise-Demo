@@ -176,7 +176,7 @@ export function NavIcon({ name }: { name: string }) {
           <path d="M5.5 9.5V20h13V9.5" />
         </svg>
       )
-    case 'Agent Network':
+    case 'Intelligence Network':
       return (
         <svg {...c}>
           <circle cx="12" cy="7" r="3" />
@@ -226,6 +226,20 @@ export function NavIcon({ name }: { name: string }) {
         <svg {...c}>
           <rect x="4" y="4" width="16" height="17" rx="2" />
           <path d="M9 3h6v3H9zM8 11h8M8 15h5" />
+        </svg>
+      )
+    case 'Capability Value Map':
+      return (
+        <svg {...c}>
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <path d="M3 9.5h18M3 15h18M9 4v16M15 4v16" />
+        </svg>
+      )
+    case 'Next Step':
+      return (
+        <svg {...c}>
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="M12 7.5V12l3 2" strokeLinecap="round" />
         </svg>
       )
     case 'Discovery Board':

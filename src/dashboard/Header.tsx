@@ -8,12 +8,14 @@ export function Header({
   mode,
   onModeChange,
   section,
+  onOpenStatus,
 }: {
   presenting: boolean
   onPresentingChange: (v: boolean) => void
   mode: string
   onModeChange: (v: string) => void
   section: string
+  onOpenStatus: () => void
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -40,6 +42,14 @@ export function Header({
       </div>
 
       <div className="flex shrink-0 items-center gap-4" style={{ paddingTop: 6 }}>
+        <button
+          type="button"
+          onClick={onOpenStatus}
+          aria-label="System status"
+          className="cond rounded-sm2 border border-line px-2 py-1 text-[10px] font-bold uppercase tracking-[0.07em] text-inkSoft hover:border-accent hover:text-accent"
+        >
+          Status
+        </button>
         <span className="cond text-[12.5px] font-semibold uppercase tracking-[0.08em] text-inkSoft">Presentation Mode</span>
 
         <button

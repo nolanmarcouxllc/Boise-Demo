@@ -16,6 +16,8 @@ import {
   utilization,
 } from '../data'
 import { metrics, priorities, agentRows, toneHex, type Tone } from './data'
+import { CapabilityDetail } from './CapabilityDetail'
+import { capabilityByKey } from './capabilities'
 
 export type Detail =
   | { kind: 'metric'; id: string }
@@ -25,6 +27,7 @@ export type Detail =
   | { kind: 'exception'; id: string }
   | { kind: 'order'; id: string }
   | { kind: 'allPriorities' }
+  | { kind: 'capability'; id: string }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -60,7 +63,7 @@ export function Drawer({ detail, onClose, onOpen }: { detail: Detail | null; onC
   return (
     <div className="absolute inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label={title}>
       <button type="button" aria-label="Close detail" onClick={onClose} className="absolute inset-0 bg-ink/30" />
-      <div className="relative flex h-full w-[520px] flex-col border-l border-line bg-white shadow-2xl">
+      <div className={`relative flex h-full flex-col border-l border-line bg-white shadow-2xl ${detail.kind === 'capability' ? 'w-[640px]' : 'w-[520px]'}`}>
         <header className="flex shrink-0 items-start justify-between gap-3 border-b border-line bg-shell px-4 py-3">
           <div className="min-w-0">
             <div className="cond text-[10px] font-bold uppercase tracking-[0.1em] text-inkSoft">{eyebrow}</div>
@@ -94,6 +97,11 @@ function LinkBtn({ label, onClick }: { label: string; onClick: () => void }) {
 
 function build(d: Detail, onOpen: (x: Detail) => void): { title: string; eyebrow: string; body: React.ReactNode } {
   switch (d.kind) {
+    case 'capability': {
+      const c = capabilityByKey.get(d.id)
+      if (!c) return { eyebrow: 'Capability', title: d.id, body: <p className="text-[12.5px] text-inkSoft">Unknown capability.</p> }
+      return { eyebrow: `Capability ${String(c.n).padStart(2, '0')} · ${c.department}`, title: c.name, body: <CapabilityDetail c={c} /> }
+    }
     case 'metric': {
       const m = metrics.find((x) => x.id === d.id)!
       const rows = evidenceFor(d.id)
@@ -171,6 +179,8 @@ function build(d: Detail, onOpen: (x: Detail) => void): { title: string; eyebrow
       }
     }
     case 'agent': {
+      const cap = capabilityByKey.get(d.id)
+      if (cap) return { eyebrow: `Capability ${String(cap.n).padStart(2, '0')} · ${cap.department}`, title: cap.name, body: <CapabilityDetail c={cap} /> }
       const row = agentRows.find((x) => x.id === d.id)!
       const full = agents[agentRows.findIndex((x) => x.id === d.id)]
       const recs = recommendations.filter((r) => r.agentId === full?.id)

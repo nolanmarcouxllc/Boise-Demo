@@ -1,4 +1,5 @@
 import { branchMetrics } from '../data'
+import { capabilities } from './capabilities'
 
 /** Reuse the existing simulated branch figures where they match the reference. */
 function metricValue(key: string, fallback: string): string {
@@ -67,18 +68,16 @@ export interface AgentRow {
   glyph: AgentGlyph
 }
 
-export const agentRows: AgentRow[] = [
-  { id: 'a1', name: 'Order Consolidation', specialty: 'Order Optimization', status: 'Detecting', statusTone: 'green', activity: 'Found 3 consolidation candidates', glyph: 'consolidate' },
-  { id: 'a2', name: 'Duplicate-Stop', specialty: 'Duplicate Detection', status: 'Comparing', statusTone: 'green', activity: 'Detected 2 overlapping stops', glyph: 'duplicate' },
-  { id: 'a3', name: 'Agility Watchdog', specialty: 'Data Validation', status: 'Monitoring', statusTone: 'green', activity: 'Validated 148 order records', glyph: 'watchdog' },
-  { id: 'a4', name: 'Route Overlap', specialty: 'Routing & Sequencing', status: 'Detecting', statusTone: 'green', activity: 'Compared 5 route plans', glyph: 'overlap' },
-  { id: 'a5', name: 'Multi-Vehicle Opt.', specialty: 'Capacity & Routing', status: 'Evaluating', statusTone: 'amber', activity: 'Evaluating 2 multi-vehicle plans', glyph: 'multi' },
-  { id: 'a6', name: 'Last-Minute Change', specialty: 'Change Management', status: 'Reviewing', statusTone: 'amber', activity: 'Reviewing 3 late order changes', glyph: 'change' },
-  { id: 'a7', name: 'Fleet vs. 3PL', specialty: 'Transportation Sourcing', status: 'Monitoring', statusTone: 'green', activity: 'Checked 4 loads vs. 3PL rates', glyph: 'fleet' },
-  { id: 'a8', name: 'Planned vs. Actual', specialty: 'Performance Monitoring', status: 'Monitoring', statusTone: 'green', activity: 'Compared plan vs. actual to date', glyph: 'variance' },
-  { id: 'a9', name: 'Branch Exception Cmd', specialty: 'Exception Management', status: 'Action Required', statusTone: 'red', activity: '3 exceptions need approval', glyph: 'exception' },
-  { id: 'a10', name: 'Management AM Brief', specialty: 'Executive Reporting', status: 'Waiting', statusTone: 'green', activity: 'Prepared morning brief', glyph: 'brief' },
-]
+/** The activity table is a live view of the ten capabilities, not a separate list. */
+export const agentRows: AgentRow[] = capabilities.map((c) => ({
+  id: c.key,
+  name: c.short,
+  specialty: c.department,
+  status: c.status,
+  statusTone: c.statusTone,
+  activity: c.activity,
+  glyph: c.glyph as AgentGlyph,
+}))
 
 export interface BriefRow {
   title: string
@@ -98,10 +97,10 @@ export const briefRows: BriefRow[] = [
   },
   {
     title: 'Route efficiency opportunity',
-    detail: 'Addressing today’s priorities could save up to 42 miles and 1.2 driver hours.',
+    detail: 'Consolidation may remove one modeled route and 74 planned miles, subject to review.',
     tone: 'amber',
     icon: 'route',
-    why: '4 duplicate-stop findings and 1 corridor overlap, all awaiting dispatcher review.',
+    why: 'The opportunity depends on product compatibility, customer windows, yard readiness and approved truck capacity.',
   },
   {
     title: 'Watch at-risk deliveries',
@@ -111,8 +110,8 @@ export const briefRows: BriefRow[] = [
     why: 'Routes 101, 102 and 104 each carry one stop projected past its appointment.',
   },
   {
-    title: 'Team ready to act',
-    detail: 'All critical agents are active and monitoring.',
+    title: 'Decisions waiting on a person',
+    detail: 'All ten capabilities are monitoring; three items await a named approver.',
     tone: 'blue',
     icon: 'team',
     why: 'Every recommendation is queued to a named approver. Nothing executes on its own.',
@@ -155,7 +154,8 @@ export const capacityViews: Record<string, CapacityBar[]> = {
 
 export const navItems = [
   'Branch Overview',
-  'Agent Network',
+  'Intelligence Network',
+  'Capability Value Map',
   'Order Flow',
   'Transportation',
   'Exceptions',
@@ -163,6 +163,7 @@ export const navItems = [
   'Planned vs. Actual',
   'Management Brief',
   'Discovery Board',
+  'Next Step',
 ] as const
 
 export type NavItem = (typeof navItems)[number]

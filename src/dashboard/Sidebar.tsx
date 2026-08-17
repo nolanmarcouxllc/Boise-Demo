@@ -1,18 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
+import { BoiseLogo } from './BoiseLogo'
 import { navItems, type NavItem } from './data'
 import { NavIcon } from './icons'
 
 function Logo() {
   return (
-    <div className="flex items-center gap-2.5 px-4" style={{ height: 88 }}>
-      <svg width="30" height="30" viewBox="0 0 40 40" aria-hidden>
-        <circle cx="20" cy="20" r="18" fill="none" stroke="#fff" strokeWidth="2" />
-        <path
-          d="M20 8.5 26.5 19h-3.2L28 27.5h-5.9V31h-4.2v-3.5H12L16.7 19h-3.2L20 8.5Z"
-          fill="#fff"
-        />
-      </svg>
-      <span className="cond text-[19px] font-semibold leading-none tracking-[0.005em] text-white">Boise Cascade</span>
+    <div className="flex items-center px-4" style={{ height: 88 }}>
+      <BoiseLogo height={30} onDark />
     </div>
   )
 }
