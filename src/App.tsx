@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { AgentActivity } from './dashboard/AgentActivity'
 import { CapacityChart } from './dashboard/CapacityChart'
 import { Header } from './dashboard/Header'
@@ -42,6 +42,36 @@ function WoodAccent() {
   )
 }
 
+/**
+ * The board is a fixed 1920x1080 canvas. Any other viewport scales the whole
+ * thing rather than reflowing it, so the proportions stay exactly as designed
+ * and nothing ever clips.
+ */
+const CANVAS_W = 1920
+const CANVAS_H = 1080
+
+function useCanvasScale() {
+  const [scale, setScale] = useState(1)
+  const raf = useRef(0)
+  useLayoutEffect(() => {
+    const measure = () => {
+      const s = Math.min(window.innerWidth / CANVAS_W, window.innerHeight / CANVAS_H)
+      setScale(Number(s.toFixed(4)))
+    }
+    measure()
+    const onResize = () => {
+      cancelAnimationFrame(raf.current)
+      raf.current = requestAnimationFrame(measure)
+    }
+    window.addEventListener('resize', onResize)
+    return () => {
+      window.removeEventListener('resize', onResize)
+      cancelAnimationFrame(raf.current)
+    }
+  }, [])
+  return scale
+}
+
 export default function App() {
   const [nav, setNav] = useState<NavItem>('Branch Overview')
   const [presenting, setPresenting] = useState(true)
@@ -50,8 +80,20 @@ export default function App() {
   const [agent, setAgent] = useState<string | null>(null)
   const [showWhy, setShowWhy] = useState(false)
 
+  const scale = useCanvasScale()
+
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-white">
+    <div className="flex h-screen w-screen items-center justify-center overflow-hidden bg-white">
+    <div
+      className="flex flex-col overflow-hidden bg-white"
+      style={{
+        width: CANVAS_W,
+        height: CANVAS_H,
+        flex: 'none',
+        transform: `scale(${scale})`,
+        transformOrigin: 'center center',
+      }}
+    >
       <div className="grid min-h-0 flex-1 grid-cols-[255px_1fr]">
         <Sidebar active={nav} onSelect={setNav} />
 
@@ -76,6 +118,7 @@ export default function App() {
       </div>
 
       <WoodAccent />
+    </div>
     </div>
   )
 }
