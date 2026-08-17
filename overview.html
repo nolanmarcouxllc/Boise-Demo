@@ -1,0 +1,501 @@
+<title>Westfield Agent Roster</title>
+
+<style>
+  /* ---------------------------------------------------------------- tokens
+     Light is the complete palette. Dark redefines only these values, twice, so
+     it works for an OS preference and for an explicit toggle. */
+  :root {
+    --ground: #faf9f6;
+    --surface: #ffffff;
+    --ink: #14181a;
+    --ink-soft: #5a6360;
+    --line: #dcdcd4;
+    --brand: #1a4528;
+    --brand-ink: #215733;
+    --brand-soft: #eef4ef;
+    --timber: #6d4a22;
+    --timber-soft: #f6efe3;
+    --band: #1a4528;
+    --band-ink: #ffffff;
+    --band-ink-soft: #d8e6dc;
+    --band-eyebrow: #a9c8b3;
+    --shadow: 0 1px 2px rgba(20, 24, 26, 0.05), 0 6px 20px rgba(20, 24, 26, 0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --ground: #121613;
+      --surface: #1a201c;
+      --ink: #f0f2ee;
+      --ink-soft: #a3aca7;
+      --line: #2c352f;
+      --brand: #7fb08c;
+      --brand-ink: #a8cdb2;
+      --brand-soft: #1b241e;
+      --timber: #d2ab73;
+      --timber-soft: #241d12;
+      --band: #16301e;
+      --band-ink: #f3f7f3;
+      --band-ink-soft: #bcd2c3;
+      --band-eyebrow: #8fb79c;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+  }
+  :root[data-theme='dark'] {
+    --ground: #121613;
+    --surface: #1a201c;
+    --ink: #f0f2ee;
+    --ink-soft: #a3aca7;
+    --line: #2c352f;
+    --brand: #7fb08c;
+    --brand-ink: #a8cdb2;
+    --brand-soft: #1b241e;
+    --timber: #d2ab73;
+    --timber-soft: #241d12;
+    --band: #16301e;
+    --band-ink: #f3f7f3;
+    --band-ink-soft: #bcd2c3;
+    --band-eyebrow: #8fb79c;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  /* ---------------------------------------------------------------- base */
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 18px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  * { box-sizing: border-box; }
+  h1, h2, h3 { margin: 0; text-wrap: balance; color: var(--ink); }
+  p { margin: 0; }
+  :focus-visible { outline: 3px solid var(--brand-ink); outline-offset: 3px; }
+
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+  .stack { display: flex; flex-direction: column; }
+
+  .eyebrow {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brand-ink);
+  }
+
+  /* ---------------------------------------------------------------- header */
+  header.top {
+    background: var(--band);
+    color: var(--band-ink);
+    padding: 40px 0 44px;
+  }
+  header.top h1 {
+    color: var(--band-ink);
+    font-size: clamp(34px, 5vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+    margin-top: 14px;
+  }
+  header.top .lede {
+    color: var(--band-ink-soft);
+    font-size: clamp(19px, 2.2vw, 24px);
+    max-width: 46ch;
+    margin-top: 18px;
+  }
+  header.top .eyebrow { color: var(--band-eyebrow); }
+  .mark {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 46px;
+  }
+  .mark span { height: 5px; border-radius: 2px; background: #caa672; }
+  .mark span:nth-child(2) { background: #7fa889; }
+  .mark span:nth-child(3) { width: 62%; background: #f0e4d2; }
+
+  /* ---------------------------------------------------------------- counts */
+  .counts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 34px;
+  }
+  .count {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 14px 22px;
+    min-width: 168px;
+  }
+  .count b {
+    display: block;
+    font-size: 40px;
+    line-height: 1.1;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: var(--band-ink);
+  }
+  .count span {
+    display: block;
+    font-size: 15px;
+    color: var(--band-ink-soft);
+    margin-top: 2px;
+  }
+
+  /* ---------------------------------------------------------------- section */
+  section { padding: 56px 0; }
+  .section-head { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+  .section-head h2 {
+    font-size: clamp(26px, 3.4vw, 38px);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    font-weight: 800;
+  }
+  .section-head p { color: var(--ink-soft); font-size: 19px; max-width: 62ch; }
+
+  /* ---------------------------------------------------------------- ten */
+  .ten { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+  .agent {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 20px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 24px 24px 22px;
+    box-shadow: var(--shadow);
+  }
+  .agent .num {
+    font-size: 58px;
+    line-height: 0.9;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    color: transparent;
+    -webkit-text-stroke: 2px var(--brand);
+    letter-spacing: -0.04em;
+  }
+  .agent h3 {
+    font-size: clamp(21px, 2.2vw, 26px);
+    line-height: 1.2;
+    font-weight: 750;
+    letter-spacing: -0.01em;
+  }
+  .agent .does { margin-top: 8px; font-size: 18px; color: var(--ink); }
+  .agent .eg {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--line);
+    font-size: 16px;
+    color: var(--ink-soft);
+  }
+  .agent .eg b { color: var(--brand-ink); font-weight: 700; }
+
+  /* ---------------------------------------------------------------- more */
+  .more-band { background: var(--timber-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .groups { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px; align-items: start; }
+  .group h3 {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--timber);
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--timber);
+    margin-bottom: 12px;
+  }
+  .group ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; }
+  .group li { font-size: 16px; line-height: 1.4; }
+  .group li b { display: block; font-weight: 700; color: var(--ink); }
+  .group li span { color: var(--ink-soft); }
+
+  /* ---------------------------------------------------------------- closing */
+  .closing {
+    background: var(--band);
+    color: var(--band-ink);
+    border-radius: 4px;
+    padding: 36px 34px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .closing h2 { color: var(--band-ink); font-size: clamp(24px, 3vw, 34px); font-weight: 800; letter-spacing: -0.015em; }
+  .closing p { color: var(--band-ink-soft); font-size: 19px; max-width: 60ch; }
+
+  .note {
+    background: var(--brand-soft);
+    border-left: 4px solid var(--brand-ink);
+    border-radius: 0 4px 4px 0;
+    padding: 18px 22px;
+    font-size: 16px;
+    color: var(--ink-soft);
+  }
+  .note b { color: var(--ink); }
+
+  footer.bottom { padding: 34px 0 56px; color: var(--ink-soft); font-size: 15px; }
+
+  .disclaimer {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: var(--band-ink-soft);
+    border-radius: 3px;
+    padding: 7px 13px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .disclaimer::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #caa672; }
+
+  @media (max-width: 900px) {
+    .ten { grid-template-columns: minmax(0, 1fr); }
+    .groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 620px) {
+    body { font-size: 17px; }
+    .wrap { padding: 0 18px; }
+    .groups { grid-template-columns: minmax(0, 1fr); }
+    .agent { grid-template-columns: 56px minmax(0, 1fr); gap: 14px; padding: 20px; }
+    .agent .num { font-size: 42px; }
+  }
+</style>
+
+<header class="top">
+  <div class="wrap stack">
+    <div class="mark" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="eyebrow" style="margin-top: 20px">Westfield Branch · Building Materials Distribution</div>
+    <h1>Ten helpers that watch the branch all day.</h1>
+    <p class="lede">Each one does a single job. None of them decide anything on their own.</p>
+
+    <div class="counts">
+      <div class="count"><b>10</b><span>Built in the demonstration</span></div>
+      <div class="count"><b>30</b><span>More the same system could do</span></div>
+      <div class="count"><b>0</b><span>Decisions taken without a person</span></div>
+    </div>
+
+    <div style="margin-top: 30px">
+      <span class="disclaimer">Demonstration Environment — Sanitized Sample Data</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">The ten</div>
+      <h2>What each one watches for</h2>
+      <p>Every example below comes from the sample day in the demonstration. Real numbers, made-up branch.</p>
+    </div>
+
+    <div class="ten">
+      <article class="agent">
+        <div class="num" aria-hidden="true">1</div>
+        <div>
+          <h3>Two trips become one</h3>
+          <p class="does">Finds orders heading the same direction so one truck can take them all.</p>
+          <p class="eg">Three orders near Northampton. <b>One truck instead of two. 74 fewer miles.</b></p>
+        </div>
+      </article>
+
+      <article class="agent">
+        <div class="num" aria-hidden="true">2</div>
+        <div>
+          <h3>Same stop twice</h3>
+          <p class="does">Notices when two trucks are sent to the same customer on the same day.</p>
+          <p class="eg">Two trucks to the same yard, <b>95 minutes apart.</b></p>
+        </div>
+      </article>
+
+      <article class="agent">
+        <div class="num" aria-hidden="true">3</div>
+        <div>
+          <h3>Missing details</h3>
+          <p class="does">Checks an order has everything routing needs before anyone plans it.</p>
+          <p class="eg">Four orders had <b>no delivery window or no unload equipment.</b></p>
+        </div>
+      </article>
+
+      <article class="agent">
+        <div class="num" aria-hidden="true">4</div>
+        <div>
+          <h3>Trucks on the same road</h3>
+          <p class="does">Shows where two routes drive the same stretch of highway.</p>
+          <p class="eg">Two routes share <b>31 miles in each direction.</b></p>
+        </div>
+      </article>
+
+      <article class="agent">
+        <div class="num" aria-hidden="true">5</div>
+        <div>
+          <h3>Who takes what</h3>
+          <p class="does">Lays out a few ways to split the work between trucks, and what each way costs.</p>
+          <p class="eg">Three plans: <b>fewest miles, best on-time, fullest trucks.</b></p>
+        </div>
+      </article>
+
+      <article class="agent">
+        <div class="num" aria-hidden="true">6</div>
+        <div>
+          <h3>Something changed late</h3>
+          <p class="does">When an order changes after planning, shows what it breaks.</p>
+          <p class="eg">Six units added while the truck was loading. <b>The load order has to change.</b></p>
+        </div>
+      </article>
+
+      <article class="agent">
+        <div class="num" aria-hidden="true">7</div>
+        <div>
+          <h3>Our truck or hire one</h3>
+          <p class="does">Says which is better, and why the cheaper one is not always right.</p>
+          <p class="eg">Keep one route. Hire out another — <b>our truck can't unload it.</b></p>
+        </div>
+      </article>
+
+      <article class="agent">
+        <div class="num" aria-hidden="true">8</div>
+        <div>
+          <h3>What really happened</h3>
+          <p class="does">Compares the plan to the actual day, so next week's plan is closer.</p>
+          <p class="eg">One stop ran 48 minutes long — <b>and has run long 4 of the last 6 times.</b></p>
+        </div>
+      </article>
+
+      <article class="agent">
+        <div class="num" aria-hidden="true">9</div>
+        <div>
+          <h3>One list of problems</h3>
+          <p class="does">Everything that needs attention in one place, with a name against each one.</p>
+          <p class="eg">15 things today. 5 urgent. <b>1 with nobody's name on it.</b></p>
+        </div>
+      </article>
+
+      <article class="agent">
+        <div class="num" aria-hidden="true">10</div>
+        <div>
+          <h3>The morning summary</h3>
+          <p class="does">One short page for the manager. Click any line to see what it is based on.</p>
+          <p class="eg">Three decisions waiting <b>before the trucks leave the yard.</b></p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="more-band">
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow" style="color: var(--timber)">And thirty more</div>
+        <h2>The same idea, pointed at the rest of the branch.</h2>
+        <p>These are not built. They are on this page to show how much of the day works the same way — something watches, something notices, a person decides.</p>
+      </div>
+
+      <div class="groups">
+        <div class="group">
+          <h3>Orders</h3>
+          <ul>
+            <li><b>Quote follow-up</b><span>Quotes that never became orders.</span></li>
+            <li><b>Order mistakes</b><span>The errors that repeat most often.</span></li>
+            <li><b>Will-call waiting</b><span>Orders sitting in the yard, unclaimed.</span></li>
+            <li><b>Time to reorder</b><span>A customer is due for their usual load.</span></li>
+            <li><b>Cutoff warning</b><span>Which orders will miss today's cutoff.</span></li>
+          </ul>
+        </div>
+
+        <div class="group">
+          <h3>Yard and loading</h3>
+          <ul>
+            <li><b>Load photo check</b><span>Does the photo match the order.</span></li>
+            <li><b>Yard backing up</b><span>When the yard is about to jam.</span></li>
+            <li><b>Find the bundle</b><span>Where product actually is in the yard.</span></li>
+            <li><b>Damage spots</b><span>Where product keeps getting damaged.</span></li>
+          </ul>
+        </div>
+
+        <div class="group">
+          <h3>Trucks and drivers</h3>
+          <ul>
+            <li><b>Truck about to break</b><span>Which unit is heading for a breakdown.</span></li>
+            <li><b>Driver hours</b><span>Warns before a driver runs out of hours.</span></li>
+            <li><b>Fuel watcher</b><span>Routes burning more than they should.</span></li>
+            <li><b>Fill the empty trip</b><span>Freight for the ride home.</span></li>
+            <li><b>Sitting and waiting</b><span>Where trucks lose time doing nothing.</span></li>
+          </ul>
+        </div>
+
+        <div class="group">
+          <h3>Money</h3>
+          <ul>
+            <li><b>Waiting charges</b><span>Where sitting time turns into a bill.</span></li>
+            <li><b>Carrier invoice check</b><span>Billed amount against the quote.</span></li>
+            <li><b>Which deliveries pay</b><span>Margin, one delivery at a time.</span></li>
+            <li><b>Too small to deliver</b><span>Orders that cost more than they earn.</span></li>
+          </ul>
+        </div>
+
+        <div class="group">
+          <h3>Customers</h3>
+          <ul>
+            <li><b>Customer going quiet</b><span>Orders dropping off before you notice.</span></li>
+            <li><b>On-time scorecard</b><span>Our record, per customer.</span></li>
+            <li><b>The same complaint</b><span>Problems that keep coming back.</span></li>
+            <li><b>Chase the appointment</b><span>Delivery windows nobody confirmed.</span></li>
+          </ul>
+        </div>
+
+        <div class="group">
+          <h3>Inventory</h3>
+          <ul>
+            <li><b>Going to run short</b><span>Product that runs out before the orders ship.</span></li>
+            <li><b>Sitting too long</b><span>Stock that has not moved.</span></li>
+            <li><b>Match what's coming in</b><span>Inbound loads against waiting orders.</span></li>
+          </ul>
+        </div>
+
+        <div class="group">
+          <h3>Rules and safety</h3>
+          <ul>
+            <li><b>Permit needed</b><span>Loads too long or too heavy to just go.</span></li>
+            <li><b>Bridges and limits</b><span>Roads a loaded truck cannot use.</span></li>
+            <li><b>Repeat incidents</b><span>Where the same thing keeps happening.</span></li>
+          </ul>
+        </div>
+
+        <div class="group">
+          <h3>People</h3>
+          <ul>
+            <li><b>New hire helper</b><span>Answers "how do we do this here."</span></li>
+            <li><b>Shift handoff</b><span>What the next shift needs to know.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<section>
+  <div class="wrap stack" style="gap: 22px">
+    <div class="closing">
+      <h2>The system catches it. The person decides it.</h2>
+      <p>Not one of these forty sends a truck, changes an order, or calls a customer on its own. They notice, they explain, and they wait for someone to say yes.</p>
+    </div>
+
+    <div class="note">
+      <b>What this is.</b> A working concept built on made-up orders, customers and routes, to show what a connected view could look like. Nothing is
+      connected to Boise Cascade's real systems, and none of the numbers describe the real Westfield branch. The next step is a working session with
+      operations and IT to find out which of these are worth building — and which are wrong.
+    </div>
+  </div>
+</section>
+
+<footer class="bottom">
+  <div class="wrap">Westfield Branch Intelligence Command Center · demonstration concept · simulated data throughout</div>
+</footer>
